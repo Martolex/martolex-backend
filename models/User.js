@@ -13,6 +13,7 @@ User.init(
     password: { type: DataTypes.TEXT, allowNull: false },
     phoneNo: { type: DataTypes.STRING(10), allowNull: false },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
+    isAdmin: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
   { sequelize: db }
 );

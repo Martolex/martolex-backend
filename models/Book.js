@@ -22,25 +22,3 @@ Book.init(
 );
 
 module.exports = Book;
-
-// const obj = {
-//   id: result.book_id,
-//   name: result.book_name,
-//   author: result.book_author,
-//   publisher: result.book_publisher,
-//   edition: result.book_edition,
-//   isbn: result.book_isbn,
-//   code: result,
-//   book_code,
-//   qty: result.book_remain_qty,
-//   rent: {
-//     1: result.onemonthrent,
-//     3: result.threemonthrent,
-//     6: result.sixmonthrent,
-//     9: result.ninemonthrent,
-//     12: result.twelvemonthrent,
-//   },
-//   desc: result.book_desc,
-//   coverImg: result.book_image,
-//   mrp: result.book_mrp,
-// };

@@ -1,13 +1,13 @@
 const { config } = require("./config");
 
 const { Sequelize } = require("sequelize");
-console.log(
-  config.dbName,
-  config.dbUserName,
-  config.dbPassword,
-  config.dbHost,
-  config.dbPort
-);
+// console.log(
+//   config.dbName,
+//   config.dbUserName,
+//   config.dbPassword,
+//   config.dbHost,
+//   config.dbPort
+// );
 
 var sequelize = new Sequelize(
   config.dbName,
