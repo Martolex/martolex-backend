@@ -1,7 +1,7 @@
 const Express = require("express");
 const App = Express();
 var session = require("express-session");
-var FileStore = require("session-file-store")(session);
+const sessionStore = require("./config/sessionStore")(session);
 const { config, env } = require("./config/config");
 const IndexRouter = require("./routes/index");
 const db = require("./config/db");
@@ -21,13 +21,18 @@ App.use(bodyParser.urlencoded({ extended: true }));
 
 App.use(
   session({
-    store: new FileStore({}),
+    store: sessionStore,
     secret: "your secret key",
     saveUninitialized: false,
     resave: false,
     cookie: { maxAge: config.maxSessionAge },
   })
 );
+require("dotenv").config();
+if (env == "dev") {
+  //   db.sync({ force: true });
+  // sessionStore.sync();
+}
 
 App.use(passport.initialize());
 App.use(passport.session());

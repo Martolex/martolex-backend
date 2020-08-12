@@ -10,6 +10,7 @@ const config = {
     port: process.env.PORT || 3000,
     jwtSecret: process.env.jwtSecret || "martolexjwttoken",
     maxSessionAge: 30 * 24 * 60 * 60 * 1000,
+    sessionCleanupInterval: 15 * 60 * 1000,
   },
 };
 module.exports = { config: config[env], env };
