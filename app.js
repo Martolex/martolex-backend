@@ -12,9 +12,6 @@ const { UserlocalStrategy, jwtStrategy } = require("./passport");
 const User = require("./models/User");
 
 require("dotenv").config();
-if (env == "dev") {
-  //   db.sync({ force: true });
-}
 
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
@@ -30,7 +27,7 @@ App.use(
 );
 require("dotenv").config();
 if (env == "dev") {
-  //   db.sync({ force: true });
+  // db.sync({ alter: true });
   // sessionStore.sync();
 }
 

@@ -1,9 +1,7 @@
 const passport = require("passport");
-const { route } = require("./books");
 const { User } = require("../models");
 const { config } = require("../config/config");
 const jwt = require("jsonwebtoken");
-const verifyRole = require("../middleware/verifyRole");
 
 const router = require("express").Router();
 const bCrypt = require("bcrypt");

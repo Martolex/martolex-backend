@@ -14,11 +14,11 @@ Book.init(
     publisher: { type: DataTypes.STRING },
     edition: DataTypes.STRING,
     quantity: { type: DataTypes.INTEGER, allowNull: false },
-    isbn: { type: DataTypes.STRING(13), allowNull: false, unique: true },
+    isbn: { type: DataTypes.STRING(13), allowNull: false },
     isApproved: { type: DataTypes.BOOLEAN, defaultValue: false },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
-  { sequelize: db }
+  { sequelize: db, indexes: [{ unique: true, fields: ["isbn", "uploader"] }] }
 );
 
 module.exports = Book;
