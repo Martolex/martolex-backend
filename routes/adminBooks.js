@@ -207,7 +207,7 @@ router
         { isDeleted: true },
         {
           where: {
-            [Op.and]: [{ id: req.body.bookId }, { uploader: req.user.id }],
+            id: req.body.bookId,
           },
         }
       );
