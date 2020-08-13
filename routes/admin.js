@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const categoriesRouter = require("./categories");
+const adminBooksRouter = require("./adminBooks");
 
 router
   .route("/")
@@ -8,4 +9,5 @@ router
   .delete(async (req, res) => {});
 
 router.use("/category", categoriesRouter);
+router.use("/books", adminBooksRouter);
 module.exports = router;

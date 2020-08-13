@@ -1,19 +1,45 @@
-const { Book, User, SubCategories, BookRent } = require("../models");
-const { ValidationError, where, Op } = require("sequelize");
-const { config } = require("../config/config");
+const { Book, SubCategories, BookRent } = require("../models");
 const buildPaginationUrls = require("../utils/buildPaginationUrls");
 
 const router = require("express").Router();
 
+router.route("/approved").get(async (req, res) => {
+  try {
+    const limit = Number(req.query.limit) || config.defaultLimit;
+    const offset = Number(req.query.offset) || 0;
+    const books = await Book.findAll({
+      where: { isApproved: true },
+      order: [["createdAt", "DESC"]],
+      limit,
+      offset,
+      include: [
+        { model: SubCategories, as: "subCat" },
+        { model: BookRent, as: "rent" },
+      ],
+    });
+    res.json({
+      code: 1,
+      data: { books },
+      pagination: buildPaginationUrls(
+        req.originalUrl.split("?")[0],
+        offset,
+        limit,
+        books.length
+      ),
+    });
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
 router
-  .route("/")
+  .route("/notApproved")
   .get(async (req, res) => {
     try {
       const limit = Number(req.query.limit) || config.defaultLimit;
       const offset = Number(req.query.offset) || 0;
-      const user = await User.findByPk(req.user.id);
-      const books = await user.getBooks({
-        where: { isDeleted: false },
+      const books = await Book.findAll({
+        where: { isApproved: false },
         order: [["createdAt", "DESC"]],
         limit,
         offset,
@@ -26,7 +52,47 @@ router
         code: 1,
         data: { books },
         pagination: buildPaginationUrls(
-          req.baseUrl,
+          req.originalUrl.split("?")[0],
+          offset,
+          limit,
+          books.length
+        ),
+      });
+    } catch (err) {
+      console.log(err);
+      res.json({ code: 0, message: "something went wrong" });
+    }
+  })
+  .post(async (req, res) => {
+    try {
+      const { bookId } = req.body;
+      await Book.update({ isApproved: true }, { where: { id: bookId } });
+      res.json({ code: 1, data: { message: "book approved" } });
+    } catch (err) {
+      res.json({ code: 0, message: "something went wrong" });
+    }
+  });
+
+router
+  .route("/")
+  .get(async (req, res) => {
+    try {
+      const limit = Number(req.query.limit) || config.defaultLimit;
+      const offset = Number(req.query.offset) || 0;
+      const books = await Book.findAll({
+        order: [["createdAt", "DESC"]],
+        limit,
+        offset,
+        include: [
+          { model: SubCategories, as: "subCat" },
+          { model: BookRent, as: "rent" },
+        ],
+      });
+      res.json({
+        code: 1,
+        data: { books },
+        pagination: buildPaginationUrls(
+          req.originalUrl.split("?")[0],
           offset,
           limit,
           books.length
@@ -150,4 +216,5 @@ router
       res.json({ code: 0, message: "something went wrong" });
     }
   });
+
 module.exports = router;
