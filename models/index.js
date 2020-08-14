@@ -6,7 +6,7 @@ const Book = require("./Book");
 const User = require("./User");
 const Categories = require("./categories");
 const SubCategories = require("./subCategories");
-
+const NotFoundBook = require("./NotFoundBook");
 Book.belongsTo(BookRent, {
   foreignKey: "rentId",
   as: "rent",
@@ -47,4 +47,5 @@ module.exports = {
   User,
   Categories,
   SubCategories,
+  NotFoundBook,
 };

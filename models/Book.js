@@ -3,6 +3,7 @@ const { Model, DataTypes, Sequelize, UUIDV4 } = require("sequelize");
 const BookRent = require("./BookRent");
 const BookImages = require("./BookImgs");
 const Cart = require("./Cart");
+const { isValidISBN } = require("../utils/customValidators");
 
 class Book extends Model {}
 
@@ -18,11 +19,7 @@ Book.init(
       type: DataTypes.STRING(13),
       allowNull: false,
       validate: {
-        isValidIISBN(isbn) {
-          if (isbn.length != 11 || isbn.length != 13) {
-            throw new Error("invalid isbn");
-          }
-        },
+        isValidISBN: isValidISBN,
       },
     },
     isApproved: { type: DataTypes.BOOLEAN, defaultValue: false },
