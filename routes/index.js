@@ -5,6 +5,7 @@ const adminRouter = require("./admin");
 
 const isLoggedIn = require("../middleware/userLoggedIn");
 const verifyRole = require("../middleware/verifyRole");
+const { userRoutes: noFoundBooksUserRouter } = require("./BooksNotFound");
 router
   .route("/")
   .get((req, res) => {
@@ -17,6 +18,8 @@ router
 router.use("/auth", authRouter);
 router.use("/admin", verifyRole, adminRouter);
 router.use("/user", isLoggedIn, userRouter);
+
+router.use("/not-found-books", noFoundBooksUserRouter);
 
 //no-find-book router
 
