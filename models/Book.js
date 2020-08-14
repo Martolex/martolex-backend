@@ -14,7 +14,17 @@ Book.init(
     publisher: { type: DataTypes.STRING },
     edition: DataTypes.STRING,
     quantity: { type: DataTypes.INTEGER, allowNull: false },
-    isbn: { type: DataTypes.STRING(13), allowNull: false },
+    isbn: {
+      type: DataTypes.STRING(13),
+      allowNull: false,
+      validate: {
+        isValidIISBN(isbn) {
+          if (isbn.length != 11 || isbn.length != 13) {
+            throw new Error("invalid isbn");
+          }
+        },
+      },
+    },
     isApproved: { type: DataTypes.BOOLEAN, defaultValue: false },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
