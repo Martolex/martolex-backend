@@ -18,7 +18,11 @@ Book.init(
     isApproved: { type: DataTypes.BOOLEAN, defaultValue: false },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
-  { sequelize: db, indexes: [{ unique: true, fields: ["isbn", "uploader"] }] }
+  {
+    sequelize: db,
+    indexes: [{ unique: true, fields: ["isbn", "uploader"] }],
+    defaultScope: { where: { isDeleted: false } },
+  }
 );
 
 module.exports = Book;

@@ -11,6 +11,7 @@ const config = {
     jwtSecret: process.env.jwtSecret || "martolexjwttoken",
     maxSessionAge: 30 * 24 * 60 * 60 * 1000,
     sessionCleanupInterval: 15 * 60 * 1000,
+    defaultLimit: 10,
   },
 };
 module.exports = { config: config[env], env };

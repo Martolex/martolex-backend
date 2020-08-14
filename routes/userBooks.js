@@ -9,14 +9,13 @@ router
   .route("/")
   .get(async (req, res) => {
     try {
-      const limit = Number(req.query.limit) || config.defaultLimit;
-      const offset = Number(req.query.offset) || 0;
+      const limit = req.query.limit || config.defaultLimit;
+      const offset = req.query.offset || 0;
       const user = await User.findByPk(req.user.id);
       const books = await user.getBooks({
-        where: { isDeleted: false },
         order: [["createdAt", "DESC"]],
-        limit,
-        offset,
+        limit: Number(limit),
+        offset: Number(offset),
         include: [
           { model: SubCategories, as: "subCat" },
           { model: BookRent, as: "rent" },
@@ -27,13 +26,13 @@ router
         data: { books },
         pagination: buildPaginationUrls(
           req.baseUrl,
-          offset,
-          limit,
+          Number(offset),
+          Number(limit),
           books.length
         ),
       });
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       res.json({ code: 0, message: "something went wrong" });
     }
   })

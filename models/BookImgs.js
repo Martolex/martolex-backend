@@ -10,7 +10,7 @@ BookImages.init(
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
     isCover: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
-  { sequelize: db }
+  { sequelize: db, defaultScope: { where: { isDeleted: false } } }
 );
 
 module.exports = BookImages;
