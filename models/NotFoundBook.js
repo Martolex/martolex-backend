@@ -34,7 +34,10 @@ NotFoundBook.init(
   },
   {
     sequelize: db,
-    defaultScope: { where: { isDeleted: false } },
+    defaultScope: {
+      where: { isDeleted: false },
+      attributes: { exclude: ["createdAt", "updatedAt", "id"] },
+    },
   }
 );
 

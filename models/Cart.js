@@ -25,6 +25,9 @@ Cart.init(
   },
   {
     sequelize: db,
+    defaultScope: {
+      attributes: { exclude: ["isDeleted", "createdAt", "updatedAt", "id"] },
+    },
     indexes: [{ unique: true, fields: ["BookId", "userId", "isDeleted"] }],
   }
 );

@@ -25,7 +25,13 @@ User.init(
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
     isAdmin: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
-  { sequelize: db }
+  {
+    sequelize: db,
+    defaultScope: {
+      where: { isDeleted: false },
+      attributes: { exclude: ["isDeleted", "createdAt", "updatedAt"] },
+    },
+  }
 );
 
 module.exports = User;

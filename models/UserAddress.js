@@ -12,7 +12,12 @@ UserAddress.init(
     state: Sequelize.STRING,
     zip: Sequelize.STRING,
   },
-  { sequelize: db }
+  {
+    sequelize: db,
+    defaultScope: {
+      attributes: { exclude: ["createdAt", "updatedAt", "UserId"] },
+    },
+  }
 );
 
 module.exports = UserAddress;

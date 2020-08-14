@@ -22,7 +22,8 @@ Book.hasMany(BookImages);
 
 Book.belongsTo(User, { foreignKey: "uploader", as: "upload" });
 User.hasMany(Book, { foreignKey: "uploader", as: "Books" });
-User.hasMany(UserAddress);
+UserAddress.belongsTo(User, { foreignKey: "UserId", as: "user" });
+User.hasMany(UserAddress, { foreignKey: "UserId", as: "addresses" });
 
 Cart.belongsTo(User, { foreignKey: "userId", as: "user" });
 User.hasMany(Cart, { foreignKey: "userId", as: "cartItems" });

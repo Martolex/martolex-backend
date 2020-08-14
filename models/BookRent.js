@@ -13,7 +13,10 @@ BookRent.init(
     deposit: { type: DataTypes.FLOAT, allowNull: false },
     mrp: { type: DataTypes.FLOAT, allowNull: false },
   },
-  { sequelize: db }
+  {
+    sequelize: db,
+    defaultScope: { attributes: { exclude: ["createdAt", "updatedAt", "id"] } },
+  }
 );
 
 module.exports = BookRent;

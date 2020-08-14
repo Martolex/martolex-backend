@@ -28,7 +28,10 @@ Book.init(
   {
     sequelize: db,
     indexes: [{ unique: true, fields: ["isbn", "uploader"] }],
-    defaultScope: { where: { isDeleted: false } },
+    defaultScope: {
+      where: { isDeleted: false },
+      attributes: { exclude: ["isDeleted", "createdAt", "updatedAt"] },
+    },
   }
 );
 
