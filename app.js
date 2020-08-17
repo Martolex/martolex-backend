@@ -5,7 +5,7 @@ const sessionStore = require("./config/sessionStore")(session);
 const { config, env } = require("./config/config");
 const IndexRouter = require("./routes/index");
 const db = require("./config/db");
-const index = require("./models/index");
+
 const bodyParser = require("body-parser");
 const passport = require("passport");
 const { UserlocalStrategy, jwtStrategy } = require("./passport");
@@ -26,6 +26,8 @@ App.use(
   })
 );
 require("dotenv").config();
+
+require("./models/index");
 if (env == "dev") {
   // db.sync({ alter: true });
   // sessionStore.sync();
