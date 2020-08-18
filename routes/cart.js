@@ -62,7 +62,7 @@ router
       });
     } catch (err) {
       if (err instanceof ValidationError) {
-        if (err.errors[0].path == "carts__book_id_user_id_is_deleted") {
+        if (err.errors[0].path == "carts__book_id_user_id") {
           await Cart.update(
             { qty: Sequelize.literal(`qty + ${qty}`) },
             {
@@ -83,18 +83,15 @@ router
     }
   })
   .delete(async (req, res) => {
-    if (!req.body.BookId) {
+    if (!req.body.bookId) {
       res.json({ code: 0, message: "badd request" });
     }
     try {
-      await Cart.update(
-        { isDeleted: true },
-        {
-          where: {
-            [Op.and]: [{ BookId: req.body.bookId }, { userId: req.user.id }],
-          },
-        }
-      );
+      await Cart.destroy({
+        where: {
+          [Op.and]: [{ BookId: req.body.bookId }, { userId: req.user.id }],
+        },
+      });
       res.json({ code: 1, data: { message: "cartItem removed Successfully" } });
     } catch (err) {
       console.log(err);

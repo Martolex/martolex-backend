@@ -21,14 +21,13 @@ Cart.init(
         ],
       },
     },
-    isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
   {
     sequelize: db,
     defaultScope: {
-      attributes: { exclude: ["isDeleted", "createdAt", "updatedAt", "id"] },
+      attributes: { exclude: ["createdAt", "updatedAt", "id"] },
     },
-    indexes: [{ unique: true, fields: ["BookId", "userId", "isDeleted"] }],
+    indexes: [{ unique: true, fields: ["BookId", "userId"] }],
   }
 );
 module.exports = Cart;
