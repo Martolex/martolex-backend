@@ -90,10 +90,9 @@ router
       res.json({ code: 0, message: "bad request" });
     }
     try {
-      await UserAddress.update(
-        { isDeleted: true },
-        { where: { type: req.body.type, UserId: req.user.id } }
-      );
+      await UserAddress.destroy({
+        where: { type: req.body.type, UserId: req.user.id },
+      });
       res.json({
         code: 1,
         data: { message: `${req.body.type} address deleted` },

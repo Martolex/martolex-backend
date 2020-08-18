@@ -26,7 +26,6 @@ UserAddress.init(
         },
       },
     },
-    isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
   {
     sequelize: db,
@@ -34,16 +33,6 @@ UserAddress.init(
     defaultScope: {
       isDeleted: false,
       attributes: { exclude: ["createdAt", "updatedAt", "UserId"] },
-    },
-    validate: {
-      async isValidAddress() {
-        const address = await UserAddress.findOne({
-          where: { isDeleted: false, type: this.type, UserId: this.UserId },
-        });
-        if (address) {
-          return new Error("address already exists");
-        }
-      },
     },
   }
 );
