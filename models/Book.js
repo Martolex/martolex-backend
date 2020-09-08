@@ -22,7 +22,7 @@ Book.init(
         isValidISBN: isValidISBN,
       },
     },
-    description: { type: DataTypes.STRING },
+    description: { type: DataTypes.TEXT },
     isApproved: { type: DataTypes.BOOLEAN, defaultValue: false },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
   },

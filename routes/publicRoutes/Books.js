@@ -4,6 +4,7 @@ const {
   SubCategories,
   BookRent,
   BookImages,
+  Categories,
 } = require("../../models");
 const { ValidationError, where, Op, Sequelize } = require("sequelize");
 const { config } = require("../../config/config");
@@ -65,7 +66,9 @@ router.route("/cat/:catId").get(async (req, res) => {
           as: "images",
           where: { isCover: true },
           attributes: ["url"],
+          required: false,
         },
+        { model: BookRent, as: "rent" },
       ],
     });
 
@@ -115,6 +118,35 @@ router.route("/cat/:catId/subCat/:subCatId").get(async (req, res) => {
         Number(limit),
         books.length
       ),
+    });
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
+
+router.route("/:bookId").get(async (req, res) => {
+  try {
+    const book = await Book.findByPk(req.params.bookId, {
+      include: [
+        {
+          model: BookImages,
+          as: "images",
+          required: false,
+          where: { isCover: true },
+          attributes: ["url"],
+        },
+        { model: BookRent, as: "rent" },
+        {
+          model: SubCategories,
+          as: "subCat",
+          include: { model: Categories, as: "category" },
+        },
+      ],
+    });
+    res.json({
+      code: 1,
+      data: book,
     });
   } catch (err) {
     console.log(err);

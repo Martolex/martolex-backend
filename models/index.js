@@ -38,6 +38,12 @@ Categories.hasMany(SubCategories, {
   onDelete: "CASCADE",
 });
 
+SubCategories.belongsTo(Categories, {
+  as: "category",
+  foreignKey: "parentCategory",
+  onDelete: "CASCADE",
+});
+
 SubCategories.hasMany(Book, { foreignKey: "subCatId", as: "books" });
 Book.belongsTo(SubCategories, { foreignKey: "subCatId", as: "subCat" });
 

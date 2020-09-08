@@ -29,7 +29,7 @@ require("dotenv").config();
 
 require("./models/index");
 if (env == "dev") {
-  // db.sync({ alter: true });
+  db.sync({ alter: true });
   // sessionStore.sync();
 }
 
