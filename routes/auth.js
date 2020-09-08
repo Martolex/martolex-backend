@@ -53,9 +53,13 @@ router.post("/signIn", async (req, res, next) => {
             config.jwtSecret
           );
           res.status(200).send({
-            auth: true,
-            token: token,
-            message: "user found & logged in",
+            code: 1,
+            data: {
+              auth: true,
+              token: token,
+              profile: user,
+              message: "user found & logged in",
+            },
           });
         });
       });

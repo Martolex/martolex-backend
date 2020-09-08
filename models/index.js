@@ -18,7 +18,8 @@ BookRent.hasOne(Book, {
   onDelete: "CASCADE",
 });
 
-Book.hasMany(BookImages);
+BookImages.belongsTo(Book);
+Book.hasMany(BookImages, { foreignKey: "BookId", as: "images" });
 
 Book.belongsTo(User, { foreignKey: "uploader", as: "upload" });
 User.hasMany(Book, { foreignKey: "uploader", as: "Books" });
@@ -37,8 +38,9 @@ Categories.hasMany(SubCategories, {
   onDelete: "CASCADE",
 });
 
-SubCategories.hasMany(Book, { foreignKey: "subCatId", as: "subCat" });
+SubCategories.hasMany(Book, { foreignKey: "subCatId", as: "books" });
 Book.belongsTo(SubCategories, { foreignKey: "subCatId", as: "subCat" });
+
 module.exports = {
   BookRent,
   BookImages,

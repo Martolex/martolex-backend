@@ -2,6 +2,7 @@ const { config } = require("../config/config");
 const querystring = require("querystring");
 
 module.exports = (relUrl, offset, limit, currCount) => {
+  relUrl = relUrl.split("?")[0];
   prevPageparams = { limit };
   nextPageParams = { limit };
   if (offset != 0) {
@@ -16,7 +17,21 @@ module.exports = (relUrl, offset, limit, currCount) => {
   }
 
   return {
-    prevUrl: config.host + relUrl + "?" + querystring.stringify(prevPageparams),
-    nextUrl: config.host + relUrl + "?" + querystring.stringify(nextPageParams),
+    prevUrl:
+      config.protocol +
+      config.host +
+      ":" +
+      config.port +
+      relUrl +
+      "?" +
+      querystring.stringify(prevPageparams),
+    nextUrl:
+      config.protocol +
+      config.host +
+      ":" +
+      config.port +
+      relUrl +
+      "?" +
+      querystring.stringify(nextPageParams),
   };
 };

@@ -5,7 +5,7 @@ const sessionStore = require("./config/sessionStore")(session);
 const { config, env } = require("./config/config");
 const IndexRouter = require("./routes/index");
 const db = require("./config/db");
-
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const passport = require("passport");
 const { UserlocalStrategy, jwtStrategy } = require("./passport");
@@ -15,7 +15,7 @@ require("dotenv").config();
 
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
-
+App.use(cors());
 App.use(
   session({
     store: sessionStore,
