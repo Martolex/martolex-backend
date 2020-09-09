@@ -59,7 +59,16 @@ router
         include: {
           model: Book,
           as: "book",
-          include: [{ model: BookRent, as: "rent" }],
+          include: [
+            { model: BookRent, as: "rent" },
+            {
+              model: BookImages,
+              attributes: ["url"],
+              as: "images",
+              required: false,
+              where: { isCover: true },
+            },
+          ],
         },
       });
       res.json({
