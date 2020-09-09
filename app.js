@@ -15,7 +15,7 @@ require("dotenv").config();
 
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
-App.use(cors());
+App.use(cors({ origin: "http://localhost:3001", credentials: true }));
 App.use(
   session({
     store: sessionStore,

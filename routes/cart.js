@@ -1,5 +1,5 @@
 const { route } = require("./categories");
-const { Cart, Book, BookRent } = require("../models");
+const { Cart, Book, BookRent, BookImages } = require("../models");
 const { config } = require("../config/config");
 const buildPaginationUrls = require("../utils/buildPaginationUrls");
 const { ValidationError, Sequelize, Op } = require("sequelize");
@@ -10,29 +10,28 @@ router
   .route("/")
   .get(async (req, res) => {
     try {
-      const limit = req.query.limit || config.defaultLimit;
-      const offset = req.query.offset || 0;
-
       const cart = await Cart.findAll({
         where: { userId: req.user.id },
-        order: [["createdAt", "DESC"]],
-        limit: Number(limit),
-        offset: Number(offset),
+        order: [["createdAt", "ASC"]],
+
         include: {
           model: Book,
           as: "book",
-          include: [{ model: BookRent, as: "rent" }],
+          include: [
+            { model: BookRent, as: "rent" },
+            {
+              model: BookImages,
+              attributes: ["url"],
+              as: "images",
+              required: false,
+              where: { isCover: true },
+            },
+          ],
         },
       });
       res.json({
         code: 1,
-        data: { cart },
-        pagination: buildPaginationUrls(
-          req.baseUrl,
-          Number(offset),
-          Number(limit),
-          cart.length
-        ),
+        data: cart,
       });
     } catch (err) {
       console.log(err);
@@ -56,9 +55,16 @@ router
         BookId: bookId,
         userId: req.user.id,
       });
+      await newCartItem.reload({
+        include: {
+          model: Book,
+          as: "book",
+          include: [{ model: BookRent, as: "rent" }],
+        },
+      });
       res.json({
         code: 1,
-        data: { message: "item added successfully to cart" },
+        data: { message: "item added successfully to cart", item: newCartItem },
       });
     } catch (err) {
       if (err instanceof ValidationError) {
@@ -123,7 +129,7 @@ router.post("/modifyPlan", async (req, res) => {
 });
 
 router.post("/modifyQty", async (req, res) => {
-  if (!req.body.bookId || !req.body.plan) {
+  if (!req.body.bookId || !req.body.plan || !req.body.qty || req.body.qty < 1) {
     res.json({ code: 0, message: "badd request" });
   }
   try {
@@ -135,7 +141,7 @@ router.post("/modifyQty", async (req, res) => {
         },
       }
     );
-    res.json({ code: 1, data: { message: "plan modified Successfully" } });
+    res.json({ code: 1, data: { message: "quantity modified Successfully" } });
   } catch (err) {
     if (err instanceof ValidationError) {
       res.json({ code: 0, message: err.errors[0].message });

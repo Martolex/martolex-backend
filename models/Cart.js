@@ -17,7 +17,7 @@ Cart.init(
       allowNull: false,
       validate: {
         isIn: [
-          ["onemonth", "threemonth", "sixmonth", "ninemonth", "twelvemonth"],
+          ["oneMonth", "threeMonth", "sixMonth", "nineMonth", "twelveMonth"],
         ],
       },
     },
