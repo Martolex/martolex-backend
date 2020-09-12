@@ -1,5 +1,6 @@
 const db = require("../config/db");
 const { Model, DataTypes, Sequelize, UUIDV4, Op } = require("sequelize");
+const { isValidPhone } = require("../utils/customValidators");
 
 class UserAddress extends Model {}
 
@@ -10,10 +11,16 @@ UserAddress.init(
       allowNull: false,
       validate: { isIn: [["home", "office", "hostel"]] },
     },
+    name: { type: DataTypes.STRING(50), allowNull: false },
     line1: { type: DataTypes.STRING, allowNull: false },
     line2: { type: DataTypes.STRING, allowNull: false },
     city: { type: DataTypes.STRING, allowNull: false },
     state: { type: DataTypes.STRING, allowNull: false },
+    phoneNo: {
+      type: DataTypes.STRING(10),
+      allowNull: false,
+      validate: { isValidPhone: isValidPhone },
+    },
     zip: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -29,7 +36,7 @@ UserAddress.init(
   },
   {
     sequelize: db,
-    indexes: [{ unique: true, fields: ["type", "UserId"] }],
+    indexes: [{ unique: true, fields: ["UserId"] }],
     defaultScope: {
       isDeleted: false,
       attributes: { exclude: ["createdAt", "updatedAt", "UserId"] },

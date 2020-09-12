@@ -39,8 +39,9 @@ router
       filters = { ...filters, type: req.query.type };
     }
     try {
-      const addresses = UserAddress.findAll(filters);
-      res.json({ code: 1, data: { addresses } });
+      console.log(filters);
+      const addresses = await UserAddress.findAll({ where: filters });
+      res.json({ code: 1, data: addresses });
     } catch (err) {
       res.json({ code: 0, message: "something went wrong" });
     }
