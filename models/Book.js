@@ -1,8 +1,6 @@
 const db = require("../config/db");
 const { Model, DataTypes, Sequelize, UUIDV4 } = require("sequelize");
-const BookRent = require("./BookRent");
-const BookImages = require("./BookImgs");
-const Cart = require("./Cart");
+
 const { isValidISBN } = require("../utils/customValidators");
 
 class Book extends Model {}

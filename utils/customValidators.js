@@ -6,7 +6,8 @@ module.exports.isValidPhone = (phone) => {
 };
 
 module.exports.isValidISBN = (isbn) => {
-  if (isbn.length != 11 || isbn.length != 13) {
+  if (isbn.length == 11 || isbn.length == 13) {
+  } else {
     throw new Error("invalid isbn");
   }
 };

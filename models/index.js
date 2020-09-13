@@ -7,6 +7,9 @@ const User = require("./User");
 const Categories = require("./categories");
 const SubCategories = require("./subCategories");
 const NotFoundBook = require("./NotFoundBook");
+const Order = require("./Order");
+const OrderItem = require("./OrderItem");
+
 Book.belongsTo(BookRent, {
   foreignKey: "rentId",
   as: "rent",
@@ -47,6 +50,22 @@ SubCategories.belongsTo(Categories, {
 SubCategories.hasMany(Book, { foreignKey: "subCatId", as: "books" });
 Book.belongsTo(SubCategories, { foreignKey: "subCatId", as: "subCat" });
 
+Order.belongsTo(User, { foreignKey: "userId", as: "user" });
+User.hasMany(Order, { foreignKey: "userId", as: "orders" });
+
+UserAddress.hasMany(Order, { foreignKey: "addressId", as: "orders" });
+Order.belongsTo(UserAddress, { foreignKey: "addressId", as: "address " });
+
+Order.hasMany(OrderItem, {
+  foreignKey: "orderId",
+  as: "items",
+  onDelete: "CASCADE",
+});
+OrderItem.belongsTo(Order, { foreignKey: "orderId", as: "order" });
+
+Book.hasMany(OrderItem, { foreignKey: "bookId", as: "ordered" });
+OrderItem.belongsTo(Book, { foreignKey: "bookId", as: "book" });
+
 module.exports = {
   BookRent,
   BookImages,
@@ -57,4 +76,5 @@ module.exports = {
   Categories,
   SubCategories,
   NotFoundBook,
+  Order,
 };
