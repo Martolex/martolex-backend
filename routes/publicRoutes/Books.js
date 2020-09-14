@@ -17,7 +17,7 @@ router.route("/").get(async (req, res) => {
     const limit = req.query.limit || config.defaultLimit;
     const offset = req.query.offset || 0;
 
-    const books = await Book.findAll({
+    const books = await Book.scope("available").findAll({
       limit: Number(limit),
       offset: Number(offset),
       include: [
@@ -52,7 +52,7 @@ router.route("/cat/:catId").get(async (req, res) => {
     const limit = Number(req.query.limit) || config.defaultLimit;
     const offset = Number(req.query.offset) || 0;
     const catId = escape(req.params.catId);
-    const books = await Book.findAll({
+    const books = await Book.scope("available").findAll({
       where: {
         subCatId: [
           Sequelize.literal(
@@ -94,7 +94,7 @@ router.route("/cat/:catId/subCat/:subCatId").get(async (req, res) => {
     const limit = Number(req.query.limit) || config.defaultLimit;
     const offset = Number(req.query.offset) || 0;
     console.log(req.params.subCatId);
-    const books = await Book.findAll({
+    const books = await Book.scope("available").findAll({
       limit,
       offset,
       where: { subCatId: req.params.subCatId },

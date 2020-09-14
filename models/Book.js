@@ -1,5 +1,5 @@
 const db = require("../config/db");
-const { Model, DataTypes, Sequelize, UUIDV4 } = require("sequelize");
+const { Model, DataTypes, Sequelize, UUIDV4, Op } = require("sequelize");
 
 const { isValidISBN } = require("../utils/customValidators");
 
@@ -12,7 +12,11 @@ Book.init(
     author: { type: DataTypes.STRING },
     publisher: { type: DataTypes.STRING },
     edition: DataTypes.STRING,
-    quantity: { type: DataTypes.INTEGER, allowNull: false },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: { min: 0 },
+    },
     isbn: {
       type: DataTypes.STRING(13),
       allowNull: false,
@@ -27,6 +31,7 @@ Book.init(
   {
     sequelize: db,
     indexes: [{ unique: true, fields: ["isbn", "uploader"] }],
+    scopes: { available: { where: { quantity: { [Op.gt]: 0 } } } },
     defaultScope: {
       where: { isDeleted: false },
       attributes: { exclude: ["isDeleted", "createdAt", "updatedAt"] },

@@ -1,4 +1,5 @@
 const { User, UserAddress } = require("../models");
+const { ValidationError } = require("sequelize");
 
 const router = require("express").Router();
 

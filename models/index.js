@@ -53,8 +53,8 @@ Book.belongsTo(SubCategories, { foreignKey: "subCatId", as: "subCat" });
 Order.belongsTo(User, { foreignKey: "userId", as: "user" });
 User.hasMany(Order, { foreignKey: "userId", as: "orders" });
 
+Order.belongsTo(UserAddress, { foreignKey: "addressId", as: "address" });
 UserAddress.hasMany(Order, { foreignKey: "addressId", as: "orders" });
-Order.belongsTo(UserAddress, { foreignKey: "addressId", as: "address " });
 
 Order.hasMany(OrderItem, {
   foreignKey: "orderId",
@@ -77,4 +77,5 @@ module.exports = {
   SubCategories,
   NotFoundBook,
   Order,
+  OrderItem,
 };
