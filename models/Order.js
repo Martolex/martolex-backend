@@ -20,6 +20,7 @@ Order.init(
     gateWayMode: { type: DataTypes.STRING },
     deliveryMinDate: { type: DataTypes.DATE },
     deliveryMaxDate: { type: DataTypes.DATE },
+    deliveryAmount: { type: DataTypes.FLOAT },
   },
   {
     sequelize: db,
