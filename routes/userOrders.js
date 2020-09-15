@@ -51,6 +51,8 @@ router.route("/cod").post(async (req, res) => {
 
           userId: req.user.id,
           userAddress: address,
+          deliveryMinDate: new Date().getTime() + 5 * 24 * 60 * 60 * 1000,
+          deliveryMaxDate: new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
         },
         { transaction: t }
       );
@@ -59,7 +61,10 @@ router.route("/cod").post(async (req, res) => {
       return order;
     });
 
-    res.json({ code: 1, data: { message: "Order created successfully" } });
+    res.json({
+      code: 1,
+      data: { message: "Order created successfully", orderId: result.id },
+    });
   } catch (err) {
     console.log(err);
     res.json({
