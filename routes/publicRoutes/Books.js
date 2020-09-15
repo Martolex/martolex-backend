@@ -72,7 +72,6 @@ router.route("/cat/:catId").get(async (req, res) => {
       ],
     });
 
-    console.log(books);
     res.json({
       code: 1,
       data: { books },
@@ -93,7 +92,6 @@ router.route("/cat/:catId/subCat/:subCatId").get(async (req, res) => {
   try {
     const limit = Number(req.query.limit) || config.defaultLimit;
     const offset = Number(req.query.offset) || 0;
-    console.log(req.params.subCatId);
     const books = await Book.scope("available").findAll({
       limit,
       offset,

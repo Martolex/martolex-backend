@@ -31,7 +31,9 @@ Book.init(
   {
     sequelize: db,
     indexes: [{ unique: true, fields: ["isbn", "uploader"] }],
-    scopes: { available: { where: { quantity: { [Op.gt]: 0 } } } },
+    scopes: {
+      available: { where: { quantity: { [Op.gt]: 0 }, isApproved: true } },
+    },
     defaultScope: {
       where: { isDeleted: false },
       attributes: { exclude: ["isDeleted", "createdAt", "updatedAt"] },

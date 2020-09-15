@@ -1,5 +1,12 @@
 const sequelize = require("../config/db");
-const { UserAddress, Order, Book, BookRent, BookImages } = require("../models");
+const {
+  UserAddress,
+  Order,
+  Book,
+  BookRent,
+  BookImages,
+  Cart,
+} = require("../models");
 const { model } = require("../config/db");
 const OrderItem = require("../models/OrderItem");
 const { paymentModes, paymentStatus } = require("../utils/enums");
@@ -11,7 +18,6 @@ const { Sequelize } = require("sequelize");
 const router = require("express").Router();
 
 router.route("/cod").post(async (req, res) => {
-  console.log(req.body);
   try {
     const result = await sequelize.transaction(async (t) => {
       let address;
@@ -44,6 +50,8 @@ router.route("/cod").post(async (req, res) => {
       const items = await OrderItem.bulkCreate(req.body.items, {
         transaction: t,
       });
+
+      Cart.destroy({ where: { userId: req.user.id } });
 
       let order = await Order.create(
         {

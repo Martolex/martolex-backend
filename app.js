@@ -40,7 +40,6 @@ passport.use("user-login-local", UserlocalStrategy.login);
 passport.use("user-login-local-jwt", jwtStrategy);
 
 passport.serializeUser(function (user, done) {
-  console.log(user);
   done(null, user.id);
 });
 passport.deserializeUser(function (id, done) {
@@ -48,7 +47,6 @@ passport.deserializeUser(function (id, done) {
     if (user) {
       done(null, user.get());
     } else {
-      console.log("abcd");
       done("error", null);
     }
   });
