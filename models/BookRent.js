@@ -5,11 +5,12 @@ class BookRent extends Model {}
 
 BookRent.init(
   {
-    oneMonth: { type: DataTypes.FLOAT, allowNull: false },
-    threeMonth: { type: DataTypes.FLOAT, allowNull: false },
-    sixMonth: { type: DataTypes.FLOAT, allowNull: false },
-    nineMonth: { type: DataTypes.FLOAT, allowNull: false },
-    twelveMonth: { type: DataTypes.FLOAT, allowNull: false },
+    oneMonth: { type: DataTypes.FLOAT },
+    threeMonth: { type: DataTypes.FLOAT },
+    sixMonth: { type: DataTypes.FLOAT },
+    nineMonth: { type: DataTypes.FLOAT },
+    twelveMonth: { type: DataTypes.FLOAT },
+    sellPrice: { type: DataTypes.FLOAT, allowNull: false },
     deposit: { type: DataTypes.FLOAT, allowNull: false },
     mrp: { type: DataTypes.FLOAT, allowNull: false },
   },

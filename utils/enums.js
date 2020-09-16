@@ -4,6 +4,7 @@ const plans = {
   SEMIANNUAL: "sixMonth",
   NINEMONTHS: "nineMonths",
   ANNUAL: "twelveMonths",
+  SELL: "sellPrice",
 };
 
 const paymentModes = {

@@ -50,6 +50,7 @@ router
         sixmonthrent,
         ninemonthrent,
         twelvemonthrent,
+        sellPrice,
         ...body
       } = req.body;
       if (body.isDeleted || body.isApproved) {
@@ -69,6 +70,7 @@ router
             sixMonth: sixmonthrent,
             nineMonth: ninemonthrent,
             twelveMonth: twelvemonthrent,
+            sellPrice,
             deposit,
             mrp,
           },
@@ -97,6 +99,7 @@ router
         sixmonthrent,
         ninemonthrent,
         twelvemonthrent,
+        sellPrice,
         ...bookDetails
       } = req.body;
       if (req.body.isDeleted || req.body.isApproved) {
@@ -119,6 +122,7 @@ router
       rent.nineMonth = ninemonthrent;
       rent.twelveMonth = twelvemonthrent;
       rent.mrp = mrp;
+      rent.sellPrice = sellPrice;
       rent.deposit = deposit;
       console.log(await rent.save());
       res.json({

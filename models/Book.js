@@ -27,6 +27,7 @@ Book.init(
     description: { type: DataTypes.TEXT },
     isApproved: { type: DataTypes.BOOLEAN, defaultValue: false },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
+    isBuyBackEnabled: { type: DataTypes.BOOLEAN, defaultValue: true },
   },
   {
     sequelize: db,
