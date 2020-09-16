@@ -157,6 +157,15 @@ router.route("/cat/:catId/subCat/:subCatId").get(async (req, res) => {
 router.route("/:bookId").get(async (req, res) => {
   try {
     const book = await Book.findByPk(req.params.bookId, {
+      attributes: [
+        ...Object.keys(Book.rawAttributes),
+        [
+          Sequelize.literal(
+            `(SELECT AVG(rating) FROM bookreviews AS breviews WHERE breviews.bookId = book.id )`
+          ),
+          "rating",
+        ],
+      ],
       include: [
         {
           model: BookImages,
@@ -166,7 +175,11 @@ router.route("/:bookId").get(async (req, res) => {
           attributes: ["url"],
         },
         { model: BookRent, as: "rent" },
-        { model: BookReview, as: "reviews" },
+        {
+          model: BookReview,
+          as: "reviews",
+          include: { model: User, as: "user", attributes: ["name"] },
+        },
         {
           model: SubCategories,
           as: "subCat",
