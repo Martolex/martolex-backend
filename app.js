@@ -10,6 +10,7 @@ const bodyParser = require("body-parser");
 const passport = require("passport");
 const { UserlocalStrategy, jwtStrategy } = require("./passport");
 const User = require("./models/User");
+const { BookReview } = require("./models");
 
 require("dotenv").config();
 
@@ -32,6 +33,8 @@ if (env == "dev") {
   // db.sync({ alter: true });
   // sessionStore.sync();
 }
+
+// BookReview.bulkCreate([]);
 
 App.use(passport.initialize());
 App.use(passport.session());

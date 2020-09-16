@@ -5,11 +5,13 @@ const {
   BookRent,
   BookImages,
   Categories,
+  BookReview,
 } = require("../../models");
 const { ValidationError, where, Op, Sequelize } = require("sequelize");
 const { config } = require("../../config/config");
 const buildPaginationUrls = require("../../utils/buildPaginationUrls");
 const db = require("../../config/db");
+const sequelize = require("../../config/db");
 const router = require("express").Router();
 
 router.route("/").get(async (req, res) => {
@@ -20,6 +22,15 @@ router.route("/").get(async (req, res) => {
     const books = await Book.scope("available").findAll({
       limit: Number(limit),
       offset: Number(offset),
+      attributes: [
+        ...Object.keys(Book.rawAttributes),
+        [
+          Sequelize.literal(
+            `(SELECT AVG(rating) FROM bookreviews AS breviews WHERE breviews.bookId = book.id )`
+          ),
+          "rating",
+        ],
+      ],
       include: [
         {
           model: BookImages,
@@ -53,6 +64,8 @@ router.route("/cat/:catId").get(async (req, res) => {
     const offset = Number(req.query.offset) || 0;
     const catId = escape(req.params.catId);
     const books = await Book.scope("available").findAll({
+      limit,
+      offset,
       where: {
         subCatId: [
           Sequelize.literal(
@@ -60,6 +73,15 @@ router.route("/cat/:catId").get(async (req, res) => {
           ),
         ],
       },
+      attributes: [
+        ...Object.keys(Book.rawAttributes),
+        [
+          Sequelize.literal(
+            `(SELECT AVG(rating) FROM bookreviews AS breviews WHERE breviews.bookId = book.id )`
+          ),
+          "rating",
+        ],
+      ],
       include: [
         {
           model: BookImages,
@@ -95,6 +117,15 @@ router.route("/cat/:catId/subCat/:subCatId").get(async (req, res) => {
     const books = await Book.scope("available").findAll({
       limit,
       offset,
+      attributes: [
+        ...Object.keys(Book.rawAttributes),
+        [
+          Sequelize.literal(
+            `(SELECT AVG(rating) FROM bookreviews AS breviews WHERE breviews.bookId = book.id )`
+          ),
+          "rating",
+        ],
+      ],
       where: { subCatId: req.params.subCatId },
       include: [
         {
@@ -135,6 +166,7 @@ router.route("/:bookId").get(async (req, res) => {
           attributes: ["url"],
         },
         { model: BookRent, as: "rent" },
+        { model: BookReview, as: "reviews" },
         {
           model: SubCategories,
           as: "subCat",

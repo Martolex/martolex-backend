@@ -17,7 +17,7 @@ var sequelize = new Sequelize(
     host: config.dbHost,
     port: config.dbPort,
     dialect: "mysql",
-    logging: false,
+    // logging: false,
   }
 );
 module.exports = sequelize;

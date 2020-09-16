@@ -9,6 +9,7 @@ const SubCategories = require("./subCategories");
 const NotFoundBook = require("./NotFoundBook");
 const Order = require("./Order");
 const OrderItem = require("./OrderItem");
+const BookReview = require("./BookReview");
 
 Book.belongsTo(BookRent, {
   foreignKey: "rentId",
@@ -66,6 +67,12 @@ OrderItem.belongsTo(Order, { foreignKey: "orderId", as: "order" });
 Book.hasMany(OrderItem, { foreignKey: "bookId", as: "ordered" });
 OrderItem.belongsTo(Book, { foreignKey: "bookId", as: "book" });
 
+Book.hasMany(BookReview, { foreignKey: "bookId", as: "reviews" });
+BookReview.belongsTo(Book, { foreignKey: "bookId", as: "book" });
+
+User.hasMany(BookReview, { foreignKey: "userId", as: "reviews" });
+BookReview.belongsTo(User, { foreignKey: "userId", as: "user" });
+
 module.exports = {
   BookRent,
   BookImages,
@@ -78,4 +85,5 @@ module.exports = {
   NotFoundBook,
   Order,
   OrderItem,
+  BookReview,
 };
