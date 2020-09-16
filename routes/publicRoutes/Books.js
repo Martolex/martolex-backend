@@ -14,14 +14,14 @@ const db = require("../../config/db");
 const sequelize = require("../../config/db");
 const router = require("express").Router();
 
-router.route("/").get(async (req, res) => {
+router.route("/search").get(async (req, res) => {
   try {
     const limit = req.query.limit || config.defaultLimit;
     const offset = req.query.offset || 0;
-
     const books = await Book.scope("available").findAll({
       limit: Number(limit),
       offset: Number(offset),
+
       attributes: [
         ...Object.keys(Book.rawAttributes),
         [
@@ -30,7 +30,14 @@ router.route("/").get(async (req, res) => {
           ),
           "rating",
         ],
+        [
+          Sequelize.literal(
+            `match(Book.name,Book.author ,Book.publisher ) against ('${req.query.search}')`
+          ),
+          "relScore",
+        ],
       ],
+      having: { relScore: { [Op.gt]: 0 } },
       include: [
         {
           model: BookImages,
@@ -38,7 +45,15 @@ router.route("/").get(async (req, res) => {
           where: { isCover: true },
           attributes: ["url"],
         },
-        { model: SubCategories, as: "subCat" },
+        {
+          model: SubCategories,
+          as: "subCat",
+          include: {
+            model: Categories,
+            as: "category",
+            attributes: ["name"],
+          },
+        },
         { model: BookRent, as: "rent" },
       ],
     });

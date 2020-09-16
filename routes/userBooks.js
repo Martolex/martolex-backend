@@ -1,4 +1,10 @@
-const { Book, User, SubCategories, BookRent } = require("../models");
+const {
+  Book,
+  User,
+  SubCategories,
+  BookRent,
+  BookReview,
+} = require("../models");
 const { ValidationError, where, Op } = require("sequelize");
 const { config } = require("../config/config");
 const buildPaginationUrls = require("../utils/buildPaginationUrls");
@@ -153,4 +159,23 @@ router
       res.json({ code: 0, message: "something went wrong" });
     }
   });
+router.route("/review").post(async (req, res) => {
+  if (!req.body.bookId) {
+    res.json({ code: 0, message: "bad request" });
+  }
+  try {
+    await BookReview.create({
+      userId: req.user.id,
+      bookId: req.body.bookId,
+      review: req.body.review,
+      rating: req.body.rating,
+    });
+    res.json({
+      code: 1,
+      data: { message: "review submitted successfully" },
+    });
+  } catch (err) {
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
 module.exports = router;

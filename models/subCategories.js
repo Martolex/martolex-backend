@@ -8,6 +8,7 @@ SubCategories.init(
   },
   {
     sequelize: db,
+    indexes: [{ type: "FULLTEXT", fields: ["name"] }],
     defaultScope: { attributes: { exclude: ["createdAt", "updatedAt"] } },
   }
 );

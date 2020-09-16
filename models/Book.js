@@ -32,7 +32,10 @@ Book.init(
   {
     sequelize: db,
 
-    indexes: [{ unique: true, fields: ["isbn", "uploader"] }],
+    indexes: [
+      { unique: true, fields: ["isbn", "uploader"] },
+      { type: "FULLTEXT", fields: ["name", "author", "publisher"] },
+    ],
     scopes: {
       available: { where: { quantity: { [Op.gt]: 0 }, isApproved: true } },
     },
