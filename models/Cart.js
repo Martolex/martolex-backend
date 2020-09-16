@@ -2,6 +2,7 @@ const db = require("../config/db");
 const { Model, DataTypes, Sequelize, UUIDV4 } = require("sequelize");
 const Book = require("./Book");
 const { min } = require("./BookRent");
+const { plans } = require("../utils/enums");
 
 class Cart extends Model {}
 Cart.init(
@@ -16,9 +17,7 @@ Cart.init(
       type: DataTypes.STRING(10),
       allowNull: false,
       validate: {
-        isIn: [
-          ["oneMonth", "threeMonth", "sixMonth", "nineMonth", "twelveMonth"],
-        ],
+        isIn: [Object.values(plans)],
       },
     },
   },
