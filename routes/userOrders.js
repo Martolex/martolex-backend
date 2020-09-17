@@ -9,12 +9,17 @@ const {
 } = require("../models");
 const { model } = require("../config/db");
 const OrderItem = require("../models/OrderItem");
-const { paymentModes, paymentStatus } = require("../utils/enums");
+const {
+  paymentModes,
+  paymentStatus,
+  plans,
+  returnStates,
+} = require("../utils/enums");
 const { route } = require("./auth");
 const config = require("../config/config");
 const buildPaginationUrls = require("../utils/buildPaginationUrls");
-const { Sequelize } = require("sequelize");
-
+const { Sequelize, where } = require("sequelize");
+const { getReturnDate } = require("../utils/orderUtils");
 const router = require("express").Router();
 
 router.route("/cod").post(async (req, res) => {
@@ -47,7 +52,16 @@ router.route("/cod").post(async (req, res) => {
         )
       );
 
-      const items = await OrderItem.bulkCreate(req.body.items, {
+      const itemsList = req.body.items.map((item) => ({
+        ...item,
+        returnDate: getReturnDate(item.plan),
+        isReturned:
+          item.plan == plans.SELL
+            ? returnStates.NOT_ELIGIBLE
+            : returnStates.NOT_RETURNED,
+      }));
+
+      const items = await OrderItem.bulkCreate(itemsList, {
         transaction: t,
       });
 
@@ -88,26 +102,43 @@ router.route("/online").post(async (req, res) => {
 });
 
 router.route("/").get(async (req, res) => {
+  console.log("abcd");
   try {
-    const limit = req.query.limit || config.config.defaultLimit;
-    const offset = req.query.offset || 0;
-
     const orders = await Order.findAll({
       where: { userId: req.user.id },
       order: [["createdAt", "DESC"]],
-      limit: Number(limit),
-      offset: Number(offset),
-      include: [],
+      include: [
+        {
+          model: OrderItem,
+          as: "items",
+          order: ["isReturned", "desc"],
+          attributes: {
+            exclude: ["createdAt", "updatedAt", "orderId", "bookId"],
+          },
+          include: {
+            model: Book,
+            as: "book",
+            attributes: ["id", "name"],
+            include: [
+              {
+                model: BookRent,
+                as: "rent",
+              },
+              {
+                model: BookImages,
+                as: "images",
+                required: false,
+                attributes: ["url"],
+                where: { isCover: 1 },
+              },
+            ],
+          },
+        },
+      ],
     });
     res.json({
       code: 1,
       data: orders,
-      pagination: buildPaginationUrls(
-        req.baseUrl,
-        Number(offset),
-        Number(limit),
-        orders.length
-      ),
     });
   } catch (err) {
     console.log(err);
@@ -124,9 +155,11 @@ router.route("/:id").get(async (req, res) => {
         {
           model: OrderItem,
           as: "items",
+
           include: {
             model: Book,
             as: "book",
+
             include: [
               {
                 model: BookRent,
