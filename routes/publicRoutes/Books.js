@@ -38,6 +38,7 @@ router.route("/search").get(async (req, res) => {
         ],
       ],
       having: { relScore: { [Op.gt]: 0 } },
+      order: [sequelize.literal(`relScore desc`)],
       include: [
         {
           model: BookImages,
@@ -61,10 +62,11 @@ router.route("/search").get(async (req, res) => {
       code: 1,
       data: { books },
       pagination: buildPaginationUrls(
-        req.baseUrl,
+        req.baseUrl + req.url,
         Number(offset),
         Number(limit),
-        books.length
+        books.length,
+        req.query
       ),
     });
   } catch (err) {
