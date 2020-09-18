@@ -2,7 +2,6 @@ const { config } = require("../config/config");
 const querystring = require("querystring");
 
 module.exports = (relUrl, offset, limit, currCount, currQuery) => {
-  console.log(relUrl);
   relUrl = relUrl.split("?")[0];
   console.log(currQuery);
   prevPageparams = { ...currQuery, limit };
@@ -17,7 +16,6 @@ module.exports = (relUrl, offset, limit, currCount, currQuery) => {
       nextPageParams.offset = offset + limit;
     }
   }
-  console.log(nextPageParams);
 
   return {
     prevUrl:

@@ -36,7 +36,7 @@ UserAddress.init(
   },
   {
     sequelize: db,
-    indexes: [{ unique: true, fields: ["UserId"] }],
+
     defaultScope: {
       isDeleted: false,
       attributes: { exclude: ["createdAt", "updatedAt", "UserId"] },

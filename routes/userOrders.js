@@ -36,7 +36,7 @@ router.route("/cod").post(async (req, res) => {
         address = await UserAddress.create(
           {
             ...req.body.address,
-            userId: req.user.id,
+            UserId: req.user.id,
           },
           {
             transaction: t,
