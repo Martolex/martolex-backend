@@ -103,7 +103,6 @@ router.route("/online").post(async (req, res) => {
 });
 
 router.route("/").get(async (req, res) => {
-  console.log("abcd");
   try {
     const orders = await Order.findAll({
       where: { userId: req.user.id },
@@ -235,6 +234,57 @@ router.route("/return/:itemId").post(async (req, res) => {
         res.json({
           code: 1,
           data: { message: "Return request submitted successfully" },
+        });
+      } else {
+        res.status(401).json({
+          code: 0,
+          message: "You are not authorized to return this order ",
+        });
+      }
+    } else {
+      res.json({ code: 0, message: "item does not exist" });
+    }
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
+
+router.route("/return/:itemId/cancelRequest").post(async (req, res) => {
+  const { itemId } = req.params;
+  const userId = req.user.id;
+  try {
+    const item = await OrderItem.findByPk(itemId, {
+      include: {
+        model: Order,
+        as: "order",
+        attributes: ["id"],
+        include: { model: User, as: "user", attributes: ["id"] },
+      },
+    });
+    if (item) {
+      if (item.order.user.id === req.user.id) {
+        console.log(typeof item.returnDate);
+        const returnDate = new Date(item.returnDate);
+        item.isReturned = returnStates.NOT_RETURNED;
+        await item.save();
+        if (returnDate.getTime() < Date.now()) {
+          res.json({
+            code: 1,
+            data: {
+              message:
+                "Return request cancelled. You cannot return your book now as the return period had expired",
+            },
+          });
+        } else {
+          res.json({
+            code: 1,
+            data: { message: "Return request cancelled" },
+          });
+        }
+        res.json({
+          code: 1,
+          data: { message: "Return request cancelled" },
         });
       } else {
         res.status(401).json({
