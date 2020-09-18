@@ -8,10 +8,11 @@ const bCrypt = require("bcrypt");
 
 router.post("/signUp", (req, res) => {
   const { email, password, phone, name } = req.body;
+  console.log(req.body);
   User.findOne({ where: { email } })
     .then((user) => {
       if (user) {
-        res.json({ code: 0, message: "user already exists" });
+        res.json({ code: 0, message: "Email ID is already registered" });
       } else {
         const hashedPassword = bCrypt.hashSync(
           password,
@@ -25,7 +26,10 @@ router.post("/signUp", (req, res) => {
           password: hashedPassword,
         });
         user.save().then((data) => {
-          res.json({ code: 1, message: "sign up successful" });
+          res.json({
+            code: 1,
+            data: { message: "sign up successful. Login to continue" },
+          });
         });
       }
     })
