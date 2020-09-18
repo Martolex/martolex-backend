@@ -6,6 +6,7 @@ const {
   BookRent,
   BookImages,
   Cart,
+  User,
 } = require("../models");
 const { model } = require("../config/db");
 const OrderItem = require("../models/OrderItem");
@@ -146,6 +147,37 @@ router.route("/").get(async (req, res) => {
   }
 });
 
+router.route("/getDeliveryAddress").get(async (req, res) => {
+  try {
+    if (req.query.orderId) {
+      const order = await Order.findByPk(req.query.orderId, {
+        attributes: ["id"],
+
+        include: [
+          { model: User, as: "user", attributes: ["id"] },
+          { model: UserAddress, as: "address" },
+        ],
+      });
+      if (order) {
+        if (order.user.id == req.user.id) {
+          res.json({ code: 1, data: order.address });
+        } else {
+          res.status(401).json({
+            code: 0,
+            message: "You are not authorized to access this order ",
+          });
+        }
+      } else {
+        res.json({ code: 0, message: "order does not exist" });
+      }
+    } else {
+      res.json({ code: 1 });
+    }
+  } catch (err) {
+    res.json({ code: 0, message: " something went wrong" });
+  }
+});
+
 router.route("/:id").get(async (req, res) => {
   try {
     const { id } = req.params;
@@ -178,6 +210,41 @@ router.route("/:id").get(async (req, res) => {
       ],
     });
     res.json({ code: 1, data: order });
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
+
+router.route("/return/:itemId").post(async (req, res) => {
+  const { itemId } = req.params;
+  const userId = req.user.id;
+  try {
+    const item = await OrderItem.findByPk(itemId, {
+      include: {
+        model: Order,
+        as: "order",
+        attributes: ["id"],
+        include: { model: User, as: "user", attributes: ["id"] },
+      },
+    });
+    if (item) {
+      if (item.order.user.id === req.user.id) {
+        item.isReturned = returnStates.RETURN_REQUESTED;
+        await item.save();
+        res.json({
+          code: 1,
+          data: { message: "Return request submitted successfully" },
+        });
+      } else {
+        res.status(401).json({
+          code: 0,
+          message: "You are not authorized to return this order ",
+        });
+      }
+    } else {
+      res.json({ code: 0, message: "item does not exist" });
+    }
   } catch (err) {
     console.log(err);
     res.json({ code: 0, message: "something went wrong" });
