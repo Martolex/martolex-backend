@@ -14,9 +14,6 @@ NotFoundBook.init(
     edition: { type: DataTypes.STRING },
     isbn: {
       type: DataTypes.STRING(13),
-      validate: {
-        isValidISBN: isValidISBN,
-      },
     },
     userName: DataTypes.STRING,
     userEmail: {
