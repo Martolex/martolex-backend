@@ -4,6 +4,7 @@ const {
   SubCategories,
   BookRent,
   BookReview,
+  Categories,
 } = require("../models");
 const { ValidationError, where, Op } = require("sequelize");
 const { config } = require("../config/config");
@@ -175,6 +176,50 @@ router.route("/review").post(async (req, res) => {
       data: { message: "review submitted successfully" },
     });
   } catch (err) {
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
+
+router.route("/getBookNames").get(async (req, res) => {
+  const { query } = req.query;
+  try {
+    const books = await Book.findAll({
+      where: { name: { [Op.like]: `${query}%` } },
+    });
+    res.json({
+      code: 1,
+      data: books,
+    });
+  } catch (err) {
+    // console.log(err);
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
+
+router.route("/:bookId").get(async (req, res) => {
+  try {
+    const book = await Book.findByPk(req.params.bookId, {
+      attributes: ["name", "author", "publisher", "edition", "id", "isbn"],
+      include: [
+        { model: BookRent, as: "rent" },
+        {
+          model: SubCategories,
+          as: "subCat",
+          attributes: ["id", "name"],
+          include: {
+            model: Categories,
+            as: "category",
+            attributes: ["id", "name"],
+          },
+        },
+      ],
+    });
+    res.json({
+      code: 1,
+      data: book,
+    });
+  } catch (err) {
+    console.log(err);
     res.json({ code: 0, message: "something went wrong" });
   }
 });
