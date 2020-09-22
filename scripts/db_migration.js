@@ -9,6 +9,10 @@ const {
   BookImages,
 } = require("../models");
 
+db.authenticate()
+  .then(() => "Connection has been established successfully.")
+  .catch((err) => console.log(err));
+
 var oldDb = new Sequelize("martolex", "root", "", {
   host: "localhost",
   port: 3306,
@@ -53,7 +57,7 @@ oldDb.query("select * from tbl_category").then(async (category) => {
           description: book.book_desc,
           isApproved: true,
           subCatId: newsubCat.id,
-          uploader: "760b7c4d-fcdb-45db-b3aa-584765457fc6",
+          uploader: "19c1563f-8a7e-456c-9681-6dd910e49d70",
           rentId: newBookRent.id,
         });
         console.log(`bookid = ${book.book_code} book created`);

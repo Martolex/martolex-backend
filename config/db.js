@@ -1,4 +1,4 @@
-const { config } = require("./config");
+const { config, env } = require("./config");
 
 const { Sequelize } = require("sequelize");
 // console.log(
@@ -17,7 +17,15 @@ var sequelize = new Sequelize(
     host: config.dbHost,
     port: config.dbPort,
     dialect: "mysql",
+
+    dialectOptions:
+      env !== "dev"
+        ? {
+            ssl: "Amazon RDS",
+          }
+        : {},
     logging: false,
   }
 );
+
 module.exports = sequelize;

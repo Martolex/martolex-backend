@@ -26,7 +26,7 @@ router.route("/search").get(async (req, res) => {
         ...Object.keys(Book.rawAttributes),
         [
           Sequelize.literal(
-            `(SELECT AVG(rating) FROM bookreviews AS breviews WHERE breviews.bookId = book.id )`
+            `(SELECT AVG(rating) FROM BookReviews AS breviews WHERE breviews.bookId = Book.id )`
           ),
           "rating",
         ],
@@ -94,7 +94,7 @@ router.route("/cat/:catId").get(async (req, res) => {
         ...Object.keys(Book.rawAttributes),
         [
           Sequelize.literal(
-            `(SELECT AVG(rating) FROM bookreviews AS breviews WHERE breviews.bookId = book.id )`
+            `(SELECT AVG(rating) FROM BookReviews AS breviews WHERE breviews.bookId = Book.id )`
           ),
           "rating",
         ],
@@ -138,7 +138,7 @@ router.route("/cat/:catId/subCat/:subCatId").get(async (req, res) => {
         ...Object.keys(Book.rawAttributes),
         [
           Sequelize.literal(
-            `(SELECT AVG(rating) FROM bookreviews AS breviews WHERE breviews.bookId = book.id )`
+            `(SELECT AVG(rating) FROM BookReviews AS breviews WHERE breviews.bookId = Book.id )`
           ),
           "rating",
         ],
@@ -178,7 +178,7 @@ router.route("/:bookId").get(async (req, res) => {
         ...Object.keys(Book.rawAttributes),
         [
           Sequelize.literal(
-            `(SELECT AVG(rating) FROM bookreviews AS breviews WHERE breviews.bookId = book.id )`
+            `(SELECT AVG(rating) FROM BookReviews AS breviews WHERE breviews.bookId = Book.id )`
           ),
           "rating",
         ],
