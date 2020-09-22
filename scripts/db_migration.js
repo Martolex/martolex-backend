@@ -13,7 +13,6 @@ var oldDb = new Sequelize("martolex", "root", "", {
   host: "localhost",
   port: 3306,
   dialect: "mysql",
-  logging: true,
 });
 
 oldDb.query("select * from tbl_category").then(async (category) => {
@@ -38,6 +37,7 @@ oldDb.query("select * from tbl_category").then(async (category) => {
           threeMonth: book.threemonthrent,
           sixMonth: book.sixmonthrent,
           nineMonth: book.ninemonthrent,
+          sellPrice: book.book_mrp - 100,
           twelveMonth: book.twelvemonthrent,
           deposit: book.book_mrp,
           mrp: book.book_mrp,

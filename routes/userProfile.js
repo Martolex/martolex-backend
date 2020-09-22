@@ -1,5 +1,6 @@
-const { User, UserAddress } = require("../models");
+const { User, UserAddress, SellerData } = require("../models");
 const { ValidationError } = require("sequelize");
+const { request } = require("express");
 
 const router = require("express").Router();
 
@@ -138,5 +139,23 @@ router
       }
     }
   });
+
+router.route("/sellerRegister").post(async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id);
+    if (!user.isSeller) {
+      const sellerInfo = await SellerData.create({ ...req.body });
+      user.isSeller = true;
+      user.sellerId = sellerInfo.id;
+      await user.save();
+
+      res.json({ code: 1, data: { message: "User registered as a seller" } });
+    } else {
+      res.json({ code: 0, message: "user is already a seller" });
+    }
+  } catch (err) {
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
 
 module.exports = router;

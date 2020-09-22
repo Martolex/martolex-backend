@@ -10,6 +10,7 @@ const NotFoundBook = require("./NotFoundBook");
 const Order = require("./Order");
 const OrderItem = require("./OrderItem");
 const BookReview = require("./BookReview");
+const SellerData = require("./SellerData");
 
 Book.belongsTo(BookRent, {
   foreignKey: "rentId",
@@ -73,6 +74,13 @@ BookReview.belongsTo(Book, { foreignKey: "bookId", as: "book" });
 User.hasMany(BookReview, { foreignKey: "userId", as: "reviews" });
 BookReview.belongsTo(User, { foreignKey: "userId", as: "user" });
 
+User.belongsTo(SellerData, {
+  foreignKey: "sellerId",
+  as: "sellerDetails",
+  onDelete: "CASCADE",
+});
+SellerData.hasOne(User, { foreignKey: "sellerId", as: "user" });
+
 module.exports = {
   BookRent,
   BookImages,
@@ -86,4 +94,5 @@ module.exports = {
   Order,
   OrderItem,
   BookReview,
+  SellerData,
 };

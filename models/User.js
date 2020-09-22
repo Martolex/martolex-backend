@@ -24,6 +24,7 @@ User.init(
     },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
     isAdmin: { type: DataTypes.BOOLEAN, defaultValue: false },
+    isSeller: { type: DataTypes.BOOLEAN, defaultValue: false },
     location: { type: DataTypes.GEOMETRY("POINT", 4326) },
   },
   {
