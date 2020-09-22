@@ -11,9 +11,14 @@ const passport = require("passport");
 const { UserlocalStrategy, jwtStrategy } = require("./passport");
 const User = require("./models/User");
 const { BookReview } = require("./models");
-
 require("dotenv").config();
+const AWS = require("aws-sdk");
+AWS.config.update({
+  signatureVersion: "v4",
+  region: "ap-south-1",
+});
 
+console.log(AWS.config.credentials.accessKeyId);
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
 App.use(cors({ origin: "http://localhost:3001", credentials: true }));
@@ -28,6 +33,7 @@ App.use(
 );
 require("dotenv").config();
 
+console.log(process.env.AWS_PROFILE);
 require("./models/index");
 if (env == "dev") {
   // db.sync({ alter: true });

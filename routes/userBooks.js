@@ -9,13 +9,15 @@ const {
 const { ValidationError, where, Op } = require("sequelize");
 const { config } = require("../config/config");
 const buildPaginationUrls = require("../utils/buildPaginationUrls");
-
+const aws = require("aws-sdk");
 const router = require("express").Router();
+const { v4: uuidv4 } = require("uuid");
 
 router
   .route("/")
   .get(async (req, res) => {
     try {
+      console.log(req.user.id);
       const limit = req.query.limit || config.defaultLimit;
       const offset = req.query.offset || 0;
       const user = await User.findByPk(req.user.id);
@@ -222,5 +224,35 @@ router.route("/:bookId").get(async (req, res) => {
     console.log(err);
     res.json({ code: 0, message: "something went wrong" });
   }
+});
+
+router.route("/get_s3_signed_url").post(async (req, res) => {
+  const s3 = new aws.S3();
+  const S3_BUCKET = config.imagesS3Bucket;
+  console.log(S3_BUCKET);
+
+  const fileType = req.body.fileType;
+  const tag = req.body.tag;
+
+  const fileKey = `${req.user.id}-${tag}-${uuidv4()}`;
+  const s3Params = {
+    Bucket: S3_BUCKET,
+    Key: fileKey,
+    Expires: 60000,
+    ContentType: fileType,
+    ACL: "public-read",
+  };
+
+  s3.getSignedUrl("putObject", s3Params, (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.end();
+    }
+    const returnData = {
+      signedRequest: data,
+      url: `https://${S3_BUCKET}.s3.amazonaws.com/${fileKey}`,
+    };
+    res.json({ code: 1, data: returnData });
+  });
 });
 module.exports = router;
