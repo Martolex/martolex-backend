@@ -4,7 +4,7 @@ const { config } = require("../config/config");
 const jwt = require("jsonwebtoken");
 
 const router = require("express").Router();
-const bCrypt = require("bcrypt");
+const bCrypt = require("bcryptjs");
 
 router.post("/signUp", (req, res) => {
   const { email, password, phone, name } = req.body;

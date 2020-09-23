@@ -1,4 +1,4 @@
-const bCrypt = require("bcrypt");
+const bCrypt = require("bcryptjs");
 const { User } = require("../models");
 const { config } = require("../config/config");
 const JWTstrategy = require("passport-jwt").Strategy;
