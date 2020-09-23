@@ -31,8 +31,9 @@ App.use(
     store: sessionStore,
     secret: "your secret key",
     saveUninitialized: false,
+
     resave: false,
-    cookie: { maxAge: config.maxSessionAge },
+    cookie: { maxAge: config.maxSessionAge, sameSite: "none" },
   })
 );
 require("dotenv").config();
