@@ -86,7 +86,7 @@ router.route("/cat/:catId").get(async (req, res) => {
       where: {
         subCatId: [
           Sequelize.literal(
-            `select id from subcategories where parentCategory=${catId}`
+            `select id from SubCategories where parentCategory=${catId}`
           ),
         ],
       },
