@@ -188,7 +188,6 @@ router.route("/:bookId").get(async (req, res) => {
           model: BookImages,
           as: "images",
           required: false,
-          where: { isCover: true },
           attributes: ["url"],
         },
         { model: BookRent, as: "rent" },

@@ -5,6 +5,7 @@ const {
   BookRent,
   BookReview,
   Categories,
+  BookImages,
 } = require("../models");
 const { ValidationError, where, Op } = require("sequelize");
 const { config } = require("../config/config");
@@ -83,8 +84,21 @@ router
             deposit,
             mrp,
           },
+          images: [
+            { url: body.frontCover, isCover: true },
+            { url: body.backCover },
+            { url: body.frontPage },
+            ...body.otherImgs.map((url) => ({
+              url,
+            })),
+          ],
         },
-        { include: [{ model: BookRent, as: "rent" }] }
+        {
+          include: [
+            { model: BookRent, as: "rent" },
+            { model: BookImages, as: "images" },
+          ],
+        }
       );
 
       res.json({
@@ -92,6 +106,7 @@ router
         data: { message: "book created successfully , pending approval" },
       });
     } catch (err) {
+      console.log(err);
       if (err instanceof ValidationError) {
         res.json({ code: 0, message: err.errors[0].message });
       }
@@ -229,7 +244,6 @@ router.route("/:bookId").get(async (req, res) => {
 router.route("/get_s3_signed_url").post(async (req, res) => {
   const s3 = new aws.S3();
   const S3_BUCKET = config.imagesS3Bucket;
-  console.log(S3_BUCKET);
 
   const fileType = req.body.fileType;
   const tag = req.body.tag;
