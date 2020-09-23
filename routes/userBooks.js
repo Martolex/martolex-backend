@@ -18,28 +18,22 @@ router
   .route("/")
   .get(async (req, res) => {
     try {
-      console.log(req.user.id);
-      const limit = req.query.limit || config.defaultLimit;
-      const offset = req.query.offset || 0;
       const user = await User.findByPk(req.user.id);
       const books = await user.getBooks({
         order: [["createdAt", "DESC"]],
-        limit: Number(limit),
-        offset: Number(offset),
         include: [
-          { model: SubCategories, as: "subCat" },
-          { model: BookRent, as: "rent" },
+          {
+            model: BookImages,
+            as: "images",
+            required: false,
+            where: { isCover: true },
+            attributes: ["url"],
+          },
         ],
       });
       res.json({
         code: 1,
-        data: { books },
-        pagination: buildPaginationUrls(
-          req.baseUrl,
-          Number(offset),
-          Number(limit),
-          books.length
-        ),
+        data: books,
       });
     } catch (err) {
       // console.log(err);
