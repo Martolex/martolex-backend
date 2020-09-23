@@ -20,7 +20,12 @@ AWS.config.update({
 
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
-App.use(cors({ credentials: true }));
+App.use(
+  cors({
+    origin: process.env.ORIGIN || "http://localhost:3001",
+    credentials: true,
+  })
+);
 App.use(
   session({
     store: sessionStore,
