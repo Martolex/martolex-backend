@@ -33,7 +33,7 @@ App.use(
     saveUninitialized: false,
 
     resave: false,
-    cookie: { maxAge: config.maxSessionAge, sameSite: "none" },
+    cookie: { maxAge: config.maxSessionAge, sameSite: "none", secure: true },
   })
 );
 require("dotenv").config();
