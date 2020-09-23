@@ -18,7 +18,6 @@ AWS.config.update({
   region: "ap-south-1",
 });
 
-console.log(AWS.config.credentials.accessKeyId);
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
 App.use(cors({ origin: "http://localhost:3001", credentials: true }));
