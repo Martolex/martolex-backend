@@ -62,8 +62,6 @@ passport.deserializeUser(function (id, done) {
 });
 
 App.use(IndexRouter);
-App.listen(config.port, config.host, () => {
-  console.log(
-    `martolex server has started at http://${config.host}:${config.port}`
-  );
+App.listen(process.env.port || config.port, () => {
+  console.log("martolex server running");
 });
