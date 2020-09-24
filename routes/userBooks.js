@@ -36,7 +36,7 @@ router
         data: books,
       });
     } catch (err) {
-      // console.log(err);
+      console.log(err);
       res.json({ code: 0, message: "something went wrong" });
     }
   })

@@ -40,35 +40,21 @@ router.post("/signUp", (req, res) => {
 });
 
 router.post("/signIn", async (req, res, next) => {
-  passport.authenticate("user-login-local", function (err, user, info) {
-    if (err) {
-      res.status(401).json({ code: 0, message: "something went wrong" });
-    } else if (info && info.message) {
-      res.status(401).json({ code: 0, message: info.message });
-    } else {
-      req.logIn(user, (err) => {
-        User.findOne({
-          where: {
-            email: user.email,
-          },
-        }).then((user) => {
-          const token = jwt.sign(
-            { id: user.username, type: "user" },
-            config.jwtSecret
-          );
-          res.status(200).send({
-            code: 1,
-            data: {
-              auth: true,
-              token: token,
-              profile: user,
-              message: "user found & logged in",
-            },
-          });
-        });
-      });
-    }
-  })(req, res, next);
+  User.findOne({
+    where: {
+      email: req.body.email,
+    },
+  }).then((user) => {
+    const token = jwt.sign({ id: user.id, type: "user" }, config.jwtSecret);
+    res.status(200).send({
+      code: 1,
+      data: {
+        auth: true,
+        token: token,
+        profile: user,
+        message: "user found & logged in",
+      },
+    });
+  });
 });
-
 module.exports = router;
