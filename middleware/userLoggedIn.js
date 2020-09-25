@@ -5,14 +5,11 @@ function isLoggedIn(req, res, next) {
   if (req.headers.authorization) {
     const { authorization } = req.headers;
     const bearerToken = authorization.split(" ")[1];
-    console.log(bearerToken);
     try {
       result = jwt.verify(bearerToken, config.jwtSecret);
-      console.log(result);
       req.user = result;
       next();
     } catch (err) {
-      console.log("here");
       res.status(401).send({ code: 0, message: "Something went wrong" });
     }
   } else {
