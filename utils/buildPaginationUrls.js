@@ -18,21 +18,7 @@ module.exports = (relUrl, offset, limit, currCount, currQuery) => {
   }
 
   return {
-    prevUrl:
-      config.protocol +
-      config.host +
-      ":" +
-      config.port +
-      relUrl +
-      "?" +
-      querystring.stringify(prevPageparams),
-    nextUrl:
-      config.protocol +
-      config.host +
-      ":" +
-      config.port +
-      relUrl +
-      "?" +
-      querystring.stringify(nextPageParams),
+    prevUrl: config.host + relUrl + "?" + querystring.stringify(prevPageparams),
+    nextUrl: config.host + relUrl + "?" + querystring.stringify(nextPageParams),
   };
 };

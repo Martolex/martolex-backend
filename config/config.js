@@ -6,7 +6,7 @@ const config = {
     dbUserName: process.env.DBUSER || "root",
     dbPassword: process.env.DBPASSWORD || "",
     dbPort: process.env.DBPORT || 3306,
-    host: process.env.HOST || "127.0.0.1",
+    host: process.env.HOST || "http://127.0.0.1:3000",
     port: process.env.PORT || 3000,
     protocol: process.env.PROTOCOL || "http://",
     jwtSecret: process.env.jwtSecret || "martolexjwttoken",
