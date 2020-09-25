@@ -16,6 +16,9 @@ module.exports = (relUrl, offset, limit, currCount, currQuery) => {
       nextPageParams.offset = offset + limit;
     }
   }
+  console.log(
+    config.host + relUrl + "?" + querystring.stringify(prevPageparams)
+  );
 
   return {
     prevUrl: config.host + relUrl + "?" + querystring.stringify(prevPageparams),
