@@ -134,9 +134,7 @@ router.route("/cat/:catId/subCat/:subCatId").get(async (req, res) => {
   console.log(req.query);
   try {
     const limit = Number(req.query.limit) || config.defaultLimit;
-    const offset = req.query.offset
-      ? Number(req.query.offset.substring(0, req.query.offset.length - 1))
-      : 0;
+    const offset = Number(req.query.offset) || 0;
     console.log(limit);
     console.log(offset);
     const books = await Book.scope("available").findAll({
