@@ -22,6 +22,9 @@ const buildPaginationUrls = require("../utils/buildPaginationUrls");
 const { Sequelize, where } = require("sequelize");
 const { getReturnDate } = require("../utils/orderUtils");
 const router = require("express").Router();
+const AWS = require("aws-sdk");
+AWS.config.update({ region: "ap-south-1" });
+const Lambda = new AWS.Lambda();
 
 router.route("/cod").post(async (req, res) => {
   try {
@@ -84,6 +87,15 @@ router.route("/cod").post(async (req, res) => {
       order.setItems(items);
       return order;
     });
+
+    if (config.env != "dev") {
+      const params = {
+        FunctionName: "email-service", // the lambda function we are going to invoke
+        InvocationType: "RequestResponse",
+        Payload: `{ "orderId" : "${result.id}" }`,
+      };
+      Lambda.invoke(params, (err, data) => {});
+    }
 
     res.json({
       code: 1,
