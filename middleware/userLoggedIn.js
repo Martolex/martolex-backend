@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { config } = require("../config/config");
 function isLoggedIn(req, res, next) {
-  console.log(req.headers);
   if (req.headers.authorization) {
     const { authorization } = req.headers;
     const bearerToken = authorization.split(" ")[1];

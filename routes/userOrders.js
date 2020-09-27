@@ -87,14 +87,21 @@ router.route("/cod").post(async (req, res) => {
       order.setItems(items);
       return order;
     });
-
+    console.log(config.env);
     if (config.env != "dev") {
       const params = {
         FunctionName: "email-service", // the lambda function we are going to invoke
         InvocationType: "RequestResponse",
         Payload: `{ "orderId" : "${result.id}" }`,
       };
-      Lambda.invoke(params, (err, data) => {});
+      console.log("executing");
+      Lambda.invoke(params, (err, data) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(data);
+        }
+      });
     }
 
     res.json({

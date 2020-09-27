@@ -1,3 +1,4 @@
+require("dotenv").config();
 const Express = require("express");
 const App = Express();
 var session = require("express-session");
@@ -7,7 +8,6 @@ const db = require("./config/db");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
-require("dotenv").config();
 const AWS = require("aws-sdk");
 AWS.config.update({
   signatureVersion: "v4",
