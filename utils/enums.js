@@ -17,6 +17,13 @@ const paymentStatus = {
   FAILED: "FAILED",
 };
 
+const orderStatus = {
+  PROCESSING: "PROCESSING",
+  SHIPPED: "SHIPPED",
+  INTRANSIT: "INTRANSIT",
+  DELIVERED: "DELIVERED",
+};
+
 const planDuration = {
   MONTHLY: 1 * 30 * 24 * 60 * 60 * 1000,
   QUATERLY: 3 * 30 * 24 * 60 * 60 * 1000,
@@ -37,5 +44,6 @@ module.exports = {
   paymentModes,
   paymentStatus,
   planDuration,
+  orderStatus,
   returnStates,
 };

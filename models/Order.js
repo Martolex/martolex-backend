@@ -1,6 +1,6 @@
 const db = require("../config/db");
 const { Model, DataTypes, Sequelize, UUIDV4 } = require("sequelize");
-const { paymentModes, paymentStatus } = require("../utils/enums");
+const { paymentModes, paymentStatus, orderStatus } = require("../utils/enums");
 
 class Order extends Model {}
 
@@ -15,6 +15,11 @@ Order.init(
       type: DataTypes.STRING,
       isIn: [Object.values(paymentStatus)],
       defaultValue: paymentStatus.PENDING,
+    },
+    orderStatus: {
+      type: DataTypes.STRING,
+      isIn: [Object.values(orderStatus)],
+      defaultValue: orderStatus.PROCESSING,
     },
     gatewayRefId: { type: DataTypes.STRING },
     gateWayMode: { type: DataTypes.STRING },
