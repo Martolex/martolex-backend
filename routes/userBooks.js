@@ -6,6 +6,7 @@ const {
   BookReview,
   Categories,
   BookImages,
+  Tags,
 } = require("../models");
 const { ValidationError, where, Op } = require("sequelize");
 const { config } = require("../config/config");
@@ -86,11 +87,13 @@ router
               url,
             })),
           ],
+          tags: (body.tags || []).map((tag) => ({ tag })),
         },
         {
           include: [
             { model: BookRent, as: "rent" },
             { model: BookImages, as: "images" },
+            { model: Tags, as: "tags" },
           ],
         }
       );

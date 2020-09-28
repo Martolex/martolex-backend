@@ -16,14 +16,25 @@ AWS.config.update({
 
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
+
+const USER_APP = process.env.ORIGIN || "http://localhost:3001";
+const ADMIN_APP = process.env.ADMIN_ORIGIN || "http://localhost:3002";
+const whiteListOrigins = [USER_APP, ADMIN_APP];
 App.use(
   cors({
-    origin: process.env.ORIGIN || "http://localhost:3001",
+    origin: function (origin, callback) {
+      if (whiteListOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
 
-require("./models/index");
+const models = require("./models/index");
+
 if (env == "dev") {
   // db.sync({ alter: true });
   // sessionStore.sync();

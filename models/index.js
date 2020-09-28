@@ -11,6 +11,8 @@ const Order = require("./Order");
 const OrderItem = require("./OrderItem");
 const BookReview = require("./BookReview");
 const SellerData = require("./SellerData");
+const Tags = require("./Tags");
+const BookTags = require("./BookTags");
 
 Book.belongsTo(BookRent, {
   foreignKey: "rentId",
@@ -48,6 +50,9 @@ SubCategories.belongsTo(Categories, {
   foreignKey: "parentCategory",
   onDelete: "CASCADE",
 });
+
+Tags.belongsToMany(Book, { through: BookTags, as: "books" });
+Book.belongsToMany(Tags, { through: BookTags, as: "tags" });
 
 SubCategories.hasMany(Book, { foreignKey: "subCatId", as: "books" });
 Book.belongsTo(SubCategories, { foreignKey: "subCatId", as: "subCat" });
@@ -95,4 +100,6 @@ module.exports = {
   OrderItem,
   BookReview,
   SellerData,
+  Tags,
+  BookTags,
 };

@@ -6,6 +6,7 @@ const {
   BookImages,
   Categories,
   BookReview,
+  Tags,
 } = require("../../models");
 const { ValidationError, where, Op, Sequelize } = require("sequelize");
 const { config } = require("../../config/config");
@@ -196,6 +197,7 @@ router.route("/:bookId").get(async (req, res) => {
           required: false,
           attributes: ["url"],
         },
+        { model: Tags, as: "tags" },
         { model: BookRent, as: "rent" },
         {
           model: BookReview,
