@@ -1,4 +1,3 @@
-const { route } = require("./categories");
 const { Cart, Book, BookRent, BookImages } = require("../models");
 const { config } = require("../config/config");
 const buildPaginationUrls = require("../utils/buildPaginationUrls");

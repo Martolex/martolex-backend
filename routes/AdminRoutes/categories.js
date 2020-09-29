@@ -1,4 +1,4 @@
-const { Categories, SubCategories } = require("../models");
+const { Categories, SubCategories } = require("../../models");
 
 const router = require("express").Router();
 

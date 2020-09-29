@@ -1,5 +1,5 @@
-const { Book, SubCategories, BookRent } = require("../models");
-const buildPaginationUrls = require("../utils/buildPaginationUrls");
+const { Book, SubCategories, BookRent } = require("../../models");
+const buildPaginationUrls = require("../../utils/buildPaginationUrls");
 
 const router = require("express").Router();
 

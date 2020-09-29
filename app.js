@@ -22,13 +22,7 @@ const ADMIN_APP = process.env.ADMIN_ORIGIN || "http://localhost:3002";
 const whiteListOrigins = [USER_APP, ADMIN_APP];
 App.use(
   cors({
-    origin: function (origin, callback) {
-      if (whiteListOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: whiteListOrigins,
     credentials: true,
   })
 );

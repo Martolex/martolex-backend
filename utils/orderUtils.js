@@ -19,5 +19,16 @@ const getReturnDate = (plan) => {
     }
   }
 };
+const itemPrice = (item) => {
+  const total =
+    item.plan === plans.SELL
+      ? item.book.rent[item.plan]
+      : item.book.rent[item.plan] + item.book.rent.deposit;
+  return total;
+};
 
-module.exports = { getReturnDate };
+const OrderTotal = (items) => {
+  return items.reduce((total, item) => total + itemPrice(item), 0);
+};
+
+module.exports = { getReturnDate, OrderTotal };
