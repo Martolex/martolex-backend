@@ -249,6 +249,7 @@ router.route("/return/:itemId").post(async (req, res) => {
     if (item) {
       if (item.order.user.id === req.user.id) {
         item.isReturned = returnStates.RETURN_REQUESTED;
+        item.returnRequestDate = new Date.now();
         await item.save();
         res.json({
           code: 1,
