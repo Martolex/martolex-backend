@@ -24,11 +24,11 @@ const itemPrice = (item) => {
     item.plan === plans.SELL
       ? item.book.rent[item.plan]
       : item.book.rent[item.plan] + item.book.rent.deposit;
-  return total;
+  return total * item.qty;
 };
 
 const OrderTotal = (items) => {
   return items.reduce((total, item) => total + itemPrice(item), 0);
 };
 
-module.exports = { getReturnDate, OrderTotal };
+module.exports = { getReturnDate, OrderTotal, itemPrice };

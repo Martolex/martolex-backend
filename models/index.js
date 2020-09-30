@@ -13,7 +13,7 @@ const BookReview = require("./BookReview");
 const SellerData = require("./SellerData");
 const Tags = require("./Tags");
 const BookTags = require("./BookTags");
-
+const ReturnPayments = require("./ReturnPayments");
 Book.belongsTo(BookRent, {
   foreignKey: "rentId",
   as: "rent",
@@ -86,6 +86,18 @@ User.belongsTo(SellerData, {
 });
 SellerData.hasOne(User, { foreignKey: "sellerId", as: "user" });
 
+OrderItem.hasMany(ReturnPayments, {
+  foreignKey: "orderItemId",
+  as: "payments",
+});
+
+ReturnPayments.belongsTo(OrderItem, { foreignKey: "orderItemId", as: "for" });
+
+ReturnPayments.belongsTo(User, { foreignKey: "userId", as: "paidTo" });
+User.hasMany(ReturnPayments, {
+  foreignKey: "userId",
+  as: "paymentsReceived",
+});
 module.exports = {
   BookRent,
   BookImages,
@@ -102,4 +114,5 @@ module.exports = {
   SellerData,
   Tags,
   BookTags,
+  ReturnPayments,
 };
