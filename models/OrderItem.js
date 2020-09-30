@@ -22,6 +22,7 @@ OrderItem.init(
       validate: { isIn: [Object.values(returnStates)] },
       defaultValue: returnStates.NOT_RETURNED,
     },
+    returnRequestDate: { type: DataTypes.DATEONLY },
   },
   {
     sequelize: db,
