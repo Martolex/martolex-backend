@@ -33,8 +33,7 @@ SellerData.init(
   {
     sequelize: db,
     defaultScope: {
-      where: { isDeleted: false },
-      attributes: { exclude: ["isDeleted", "createdAt", "updatedAt", "id"] },
+      attributes: { exclude: ["createdAt", "updatedAt", "id"] },
     },
   }
 );
