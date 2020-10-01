@@ -28,7 +28,10 @@ const itemPrice = (item) => {
 };
 
 const OrderTotal = (items) => {
-  return items.reduce((total, item) => total + itemPrice(item), 0);
+  return items.reduce(
+    (total, item) => total + item.qty * (item.rent + item.deposit),
+    0
+  );
 };
 
 module.exports = { getReturnDate, OrderTotal, itemPrice };

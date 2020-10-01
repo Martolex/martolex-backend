@@ -87,7 +87,6 @@ router.route("/cod").post(async (req, res) => {
       order.setItems(items);
       return order;
     });
-    console.log(config.env);
     if (config.env != "dev") {
       const params = {
         FunctionName: "email-service", // the lambda function we are going to invoke
@@ -139,10 +138,6 @@ router.route("/").get(async (req, res) => {
             as: "book",
             attributes: ["id", "name"],
             include: [
-              {
-                model: BookRent,
-                as: "rent",
-              },
               {
                 model: BookImages,
                 as: "images",

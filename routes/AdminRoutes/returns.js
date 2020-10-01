@@ -69,14 +69,13 @@ router
   .get(async (req, res) => {
     try {
       const item = await OrderItem.findByPk(req.params.id, {
-        attributes: ["id", "plan", "qty"],
+        attributes: ["id", "plan", "qty", "rent", "deposit"],
         include: [
           {
             model: Book,
             as: "book",
             attributes: ["id"],
             include: [
-              { model: BookRent, as: "rent" },
               {
                 model: User,
                 as: "upload",
@@ -90,8 +89,8 @@ router
           },
         ],
       });
-      const returnToSeller = itemPrice(item) - item.book.rent.deposit;
-      const returnToBuyer = item.book.rent.deposit;
+      const returnToSeller = item.rent;
+      const returnToBuyer = item.deposit;
       res.json({
         code: 1,
         data: { returnToSeller, returnToBuyer, seller: item.book.upload },

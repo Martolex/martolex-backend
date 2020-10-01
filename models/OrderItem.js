@@ -23,6 +23,8 @@ OrderItem.init(
       defaultValue: returnStates.NOT_RETURNED,
     },
     returnRequestDate: { type: DataTypes.DATEONLY },
+    rent: { type: DataTypes.FLOAT },
+    deposit: { type: DataTypes.FLOAT },
   },
   {
     sequelize: db,

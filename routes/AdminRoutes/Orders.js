@@ -47,7 +47,6 @@ router.route("/").get(async (req, res) => {
           model: Book,
           attributes: ["id"],
           as: "book",
-          include: { model: BookRent, as: "rent" },
         },
       },
     ],
@@ -92,7 +91,6 @@ router.route("/:id").get(async (req, res) => {
             attributes: ["id", "name", "author", "publisher", "isbn"],
             as: "book",
             include: [
-              { model: BookRent, as: "rent" },
               {
                 model: User,
                 as: "upload",
