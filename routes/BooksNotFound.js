@@ -25,22 +25,22 @@ UserRouter.post("/", async (req, res) => {
 });
 adminRouter.get("/", async (req, res) => {
   try {
-    const limit = Number(req.query.limit) || config.defaultLimit;
-    const offset = Number(req.query.offset) || 0;
+    // const limit = Number(req.query.limit) || config.defaultLimit;
+    // const offset = Number(req.query.offset) || 0;
     const books = await NotFoundBook.findAll({
       order: [["createdAt", "DESC"]],
-      limit,
-      offset,
+      // limit,
+      // offset,
     });
     res.json({
       code: 1,
-      data: { books },
-      pagination: buildPaginationUrls(
-        req.originalUrl.split("?")[0],
-        offset,
-        limit,
-        books.length
-      ),
+      data: books,
+      // pagination: buildPaginationUrls(
+      //   req.originalUrl.split("?")[0],
+      //   offset,
+      //   limit,
+      //   books.length
+      // ),
     });
   } catch (err) {
     console.log(err);
