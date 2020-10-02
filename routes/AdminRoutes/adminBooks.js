@@ -1,9 +1,17 @@
-const { Book, SubCategories, BookRent } = require("../../models");
+const {
+  Book,
+  SubCategories,
+  BookRent,
+  Categories,
+  User,
+  BookImages,
+  BookReview,
+} = require("../../models");
 const buildPaginationUrls = require("../../utils/buildPaginationUrls");
-
+const { ValidationError, Sequelize } = require("sequelize");
 const router = require("express").Router();
 
-router.route("/approved").get(async (req, res) => {
+router.route("/thirdParty/approved").get(async (req, res) => {
   try {
     const limit = Number(req.query.limit) || config.defaultLimit;
     const offset = Number(req.query.offset) || 0;
@@ -33,7 +41,7 @@ router.route("/approved").get(async (req, res) => {
   }
 });
 router
-  .route("/notApproved")
+  .route("/thirdParty/notApproved")
   .get(async (req, res) => {
     try {
       const limit = Number(req.query.limit) || config.defaultLimit;
@@ -74,29 +82,46 @@ router
   });
 
 router
-  .route("/")
+  .route("/martolex")
   .get(async (req, res) => {
     try {
-      const limit = Number(req.query.limit) || config.defaultLimit;
-      const offset = Number(req.query.offset) || 0;
+      // const limit = Number(req.query.limit) || config.defaultLimit;
+      // const offset = Number(req.query.offset) || 0;
       const books = await Book.findAll({
         order: [["createdAt", "DESC"]],
-        limit,
-        offset,
+        attributes: ["id", "name", "author", "publisher", "quantity"],
+        // limit,
+        // offset,
         include: [
-          { model: SubCategories, as: "subCat" },
-          { model: BookRent, as: "rent" },
+          {
+            model: SubCategories,
+            as: "subCat",
+            attributes: ["name", "id"],
+            include: {
+              model: Categories,
+              as: "category",
+              attributes: ["id", "name"],
+            },
+          },
+          // { model: BookRent, as: "rent" },
+          {
+            model: User,
+            as: "upload",
+            attributes: [],
+            where: { isAdmin: true },
+            required: true,
+          },
         ],
       });
       res.json({
         code: 1,
-        data: { books },
-        pagination: buildPaginationUrls(
-          req.originalUrl.split("?")[0],
-          offset,
-          limit,
-          books.length
-        ),
+        data: books,
+        // pagination: buildPaginationUrls(
+        //   req.originalUrl.split("?")[0],
+        //   offset,
+        //   limit,
+        //   books.length
+        // ),
       });
     } catch (err) {
       console.log(err);
@@ -175,7 +200,7 @@ router
       await Book.update(
         {
           ...bookDetails,
-          isApproved: false,
+          isApproved: true,
         },
         { where: { [Op.and]: [{ id: bookId }, { uploader: req.user.id }] } }
       );
@@ -194,7 +219,7 @@ router
       console.log(await rent.save());
       res.json({
         code: 1,
-        data: { message: "book modified successfully, pending approval" },
+        data: { message: "book modified successfully" },
       });
     } catch (err) {
       if (err instanceof ValidationError) {
@@ -220,5 +245,53 @@ router
       res.json({ code: 0, message: "something went wrong" });
     }
   });
+
+router.route("/:bookId").get(async (req, res) => {
+  try {
+    const book = await Book.findByPk(req.params.bookId, {
+      attributes: [
+        ...Object.keys(Book.rawAttributes),
+        [
+          Sequelize.literal(
+            `(SELECT avg(rating)  FROM BookReviews AS breviews WHERE breviews.bookId = Book.id )`
+          ),
+          "rating",
+        ],
+      ],
+      include: [
+        {
+          model: BookImages,
+          as: "images",
+          required: false,
+          attributes: ["url"],
+        },
+
+        { model: BookRent, as: "rent" },
+        {
+          model: BookReview,
+          as: "reviews",
+          include: { model: User, as: "user", attributes: ["name"] },
+        },
+        {
+          model: SubCategories,
+          as: "subCat",
+          include: { model: Categories, as: "category" },
+        },
+        {
+          model: User,
+          as: "upload",
+          attributes: ["name", "email", "id", "isAdmin"],
+        },
+      ],
+    });
+    res.json({
+      code: 1,
+      data: book,
+    });
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
 
 module.exports = router;

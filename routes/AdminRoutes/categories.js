@@ -69,6 +69,13 @@ router
     }
   });
 
+router.route("/subCategories/:id").get(async (req, res) => {
+  const subCategories = await SubCategories.findAll({
+    where: { parentCategory: req.params.id },
+  });
+  res.json({ code: 1, data: subCategories });
+});
+
 router.get("/tree", async (req, res) => {
   try {
     const categories = await Categories.findAll({
