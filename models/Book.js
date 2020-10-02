@@ -2,6 +2,7 @@ const db = require("../config/db");
 const { Model, DataTypes, Sequelize, UUIDV4, Op } = require("sequelize");
 
 const { isValidISBN } = require("../utils/customValidators");
+const { approvalStates } = require("../utils/enums");
 
 class Book extends Model {}
 
@@ -25,7 +26,11 @@ Book.init(
       },
     },
     description: { type: DataTypes.TEXT },
-    isApproved: { type: DataTypes.BOOLEAN, defaultValue: false },
+    isApproved: {
+      type: DataTypes.INTEGER,
+      defaultValue: approvalStates.PENDING,
+      validate: { isIn: [Object.values(approvalStates)] },
+    },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
     isBuyBackEnabled: { type: DataTypes.BOOLEAN, defaultValue: true },
   },
@@ -37,7 +42,12 @@ Book.init(
       { type: "FULLTEXT", fields: ["name", "author", "publisher"] },
     ],
     scopes: {
-      available: { where: { quantity: { [Op.gt]: 0 }, isApproved: true } },
+      available: {
+        where: {
+          quantity: { [Op.gt]: 0 },
+          isApproved: approvalStates.APPROVED,
+        },
+      },
     },
     defaultScope: {
       where: { isDeleted: false },

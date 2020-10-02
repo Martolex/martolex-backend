@@ -39,6 +39,8 @@ const returnStates = {
   NOT_ELIGIBLE: -1,
 };
 
+const approvalStates = { PENDING: 0, NOT_APPROVED: -1, APPROVED: 1 };
+
 module.exports = {
   plans,
   paymentModes,
@@ -46,4 +48,5 @@ module.exports = {
   planDuration,
   orderStatus,
   returnStates,
+  approvalStates,
 };

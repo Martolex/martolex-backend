@@ -7,79 +7,165 @@ const {
   BookImages,
   BookReview,
 } = require("../../models");
+const { approvalStates } = require("../../utils/enums");
 const buildPaginationUrls = require("../../utils/buildPaginationUrls");
 const { ValidationError, Sequelize } = require("sequelize");
 const router = require("express").Router();
 
 router.route("/thirdParty/approved").get(async (req, res) => {
   try {
-    const limit = Number(req.query.limit) || config.defaultLimit;
-    const offset = Number(req.query.offset) || 0;
+    // const limit = Number(req.query.limit) || config.defaultLimit;
+    // const offset = Number(req.query.offset) || 0;
     const books = await Book.findAll({
-      where: { isApproved: true },
       order: [["createdAt", "DESC"]],
-      limit,
-      offset,
+      attributes: ["id", "name", "author", "publisher", "quantity"],
+      where: { isApproved: approvalStates.APPROVED },
+
       include: [
-        { model: SubCategories, as: "subCat" },
-        { model: BookRent, as: "rent" },
+        {
+          model: SubCategories,
+          as: "subCat",
+          attributes: ["name", "id"],
+          include: {
+            model: Categories,
+            as: "category",
+            attributes: ["id", "name"],
+          },
+        },
+        {
+          model: User,
+          as: "upload",
+          attributes: ["name", "id"],
+          where: { isAdmin: false },
+          required: true,
+        },
       ],
     });
     res.json({
       code: 1,
-      data: { books },
-      pagination: buildPaginationUrls(
-        req.originalUrl.split("?")[0],
-        offset,
-        limit,
-        books.length
-      ),
+      data: books,
+      // pagination: buildPaginationUrls(
+      //   req.originalUrl.split("?")[0],
+      //   offset,
+      //   limit,
+      //   books.length
+      // ),
     });
   } catch (err) {
     console.log(err);
     res.json({ code: 0, message: "something went wrong" });
   }
 });
-router
-  .route("/thirdParty/notApproved")
-  .get(async (req, res) => {
-    try {
-      const limit = Number(req.query.limit) || config.defaultLimit;
-      const offset = Number(req.query.offset) || 0;
-      const books = await Book.findAll({
-        where: { isApproved: false },
-        order: [["createdAt", "DESC"]],
-        limit,
-        offset,
-        include: [
-          { model: SubCategories, as: "subCat" },
-          { model: BookRent, as: "rent" },
-        ],
-      });
-      res.json({
-        code: 1,
-        data: { books },
-        pagination: buildPaginationUrls(
-          req.originalUrl.split("?")[0],
-          offset,
-          limit,
-          books.length
-        ),
-      });
-    } catch (err) {
-      console.log(err);
-      res.json({ code: 0, message: "something went wrong" });
+router.route("/thirdParty/approval").post(async (req, res) => {
+  try {
+    const { bookId, status } = req.body;
+    const approvalStatus = status.toUpperCase();
+    if (!["APPROVED", "NOT_APPROVED"].includes(approvalStatus)) {
+      res.json({ code: 0, message: "not a valid status" });
     }
-  })
-  .post(async (req, res) => {
-    try {
-      const { bookId } = req.body;
-      await Book.update({ isApproved: true }, { where: { id: bookId } });
+    // call the email lambda with the status and reason if not approved
+
+    await Book.update(
+      { isApproved: approvalStates[approvalStatus] },
+      { where: { id: bookId } }
+    );
+    if (approvalStates[approvalStatus] == approvalStates.APPROVED) {
       res.json({ code: 1, data: { message: "book approved" } });
-    } catch (err) {
-      res.json({ code: 0, message: "something went wrong" });
+    } else {
+      res.json({ code: 1, data: { message: "Rejection Recorded" } });
     }
-  });
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
+router.route("/thirdParty/pendingApproval").get(async (req, res) => {
+  try {
+    // const limit = Number(req.query.limit) || config.defaultLimit;
+    // const offset = Number(req.query.offset) || 0;
+    const books = await Book.findAll({
+      order: [["createdAt", "DESC"]],
+      attributes: ["id", "name", "author", "publisher", "quantity"],
+      where: { isApproved: approvalStates.PENDING },
+      include: [
+        {
+          model: SubCategories,
+          as: "subCat",
+          attributes: ["name", "id"],
+          include: {
+            model: Categories,
+            as: "category",
+            attributes: ["id", "name"],
+          },
+        },
+        {
+          model: User,
+          as: "upload",
+          attributes: ["name", "id"],
+          where: { isAdmin: false },
+          required: true,
+        },
+      ],
+    });
+    res.json({
+      code: 1,
+      data: books,
+      // pagination: buildPaginationUrls(
+      //   req.originalUrl.split("?")[0],
+      //   offset,
+      //   limit,
+      //   books.length
+      // ),
+    });
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
+router.route("/thirdParty/notApproved").get(async (req, res) => {
+  try {
+    // const limit = Number(req.query.limit) || config.defaultLimit;
+    // const offset = Number(req.query.offset) || 0;
+    const books = await Book.findAll({
+      order: [["createdAt", "DESC"]],
+      attributes: ["id", "name", "author", "publisher", "quantity"],
+      where: { isApproved: approvalStates.NOT_APPROVED },
+
+      include: [
+        {
+          model: SubCategories,
+          as: "subCat",
+          attributes: ["name", "id"],
+          include: {
+            model: Categories,
+            as: "category",
+            attributes: ["id", "name"],
+          },
+        },
+        {
+          model: User,
+          as: "upload",
+          attributes: ["name", "id"],
+          where: { isAdmin: false },
+          required: true,
+        },
+      ],
+    });
+    res.json({
+      code: 1,
+      data: books,
+      // pagination: buildPaginationUrls(
+      //   req.originalUrl.split("?")[0],
+      //   offset,
+      //   limit,
+      //   books.length
+      // ),
+    });
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
 
 router
   .route("/martolex")
@@ -103,7 +189,6 @@ router
               attributes: ["id", "name"],
             },
           },
-          // { model: BookRent, as: "rent" },
           {
             model: User,
             as: "upload",
