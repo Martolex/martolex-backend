@@ -12,11 +12,12 @@ BookReview.init(
       allowNull: false,
       validate: { min: 1, max: 5 },
     },
+    isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
   {
     sequelize: db,
 
-    defaultScope: {},
+    defaultScope: { where: { isDeleted: false } },
   }
 );
 
