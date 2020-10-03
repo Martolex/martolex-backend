@@ -5,6 +5,7 @@ const adminOrdersRouter = require("./Orders");
 const returnsRouter = require("./returns");
 const newsletterRouter = require("./newsletter");
 const { adminRoutes: BooksNotFoundAdminRouter } = require("../BooksNotFound");
+const adminReviewsRouter = require("./reviews");
 
 router;
 
@@ -14,6 +15,7 @@ router.use("/orders", adminOrdersRouter);
 router.use("/not-found-books", BooksNotFoundAdminRouter);
 router.use("/returns", returnsRouter);
 router.use("/newsletter", newsletterRouter);
+router.use("/reviews", adminReviewsRouter);
 
 //orders router
 
