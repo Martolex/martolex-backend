@@ -14,6 +14,7 @@ const SellerData = require("./SellerData");
 const Tags = require("./Tags");
 const BookTags = require("./BookTags");
 const ReturnPayments = require("./ReturnPayments");
+const NewsLetterSubscriber = require("./NewsLetterSubscriber");
 Book.belongsTo(BookRent, {
   foreignKey: "rentId",
   as: "rent",
@@ -115,4 +116,5 @@ module.exports = {
   Tags,
   BookTags,
   ReturnPayments,
+  NewsLetterSubscriber,
 };

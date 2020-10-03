@@ -4,6 +4,8 @@ const userRouter = require("./user");
 const adminRouter = require("./AdminRoutes/admin");
 const categoriesRouter = require("./publicRoutes/categoriesRouter");
 const booksRouter = require("./publicRoutes/Books");
+const newsLetterRouter = require("./publicRoutes/newsletter");
+
 const isLoggedIn = require("../middleware/userLoggedIn");
 const verifyRole = require("../middleware/verifyRole");
 const { userRoutes: noFoundBooksUserRouter } = require("./BooksNotFound");
@@ -21,6 +23,7 @@ router.use("/admin", verifyRole, adminRouter);
 router.use("/user", isLoggedIn, userRouter);
 router.use("/categories", categoriesRouter);
 router.use("/books", booksRouter);
+router.use("/newsletter", newsLetterRouter);
 router.use("/not-found-books", noFoundBooksUserRouter);
 
 //no-find-book router
