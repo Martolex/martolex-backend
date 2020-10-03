@@ -39,6 +39,31 @@ router.route("/requested").get(async (req, res) => {
   }
 });
 
+router.route("/processed").get(async (req, res) => {
+  try {
+    const items = await OrderItem.findAll({
+      order: [["returnRequestDate", "DESC"]],
+      where: { isReturned: returnStates.RETURNED },
+      attributes: ["plan", "qty", "returnRequestDate", "returnDate", "id"],
+
+      include: [
+        {
+          model: Order,
+          as: "order",
+          attributes: ["id", "createdAt"],
+          include: [{ model: User, as: "user", attributes: ["name", "id"] }],
+        },
+        { model: Book, as: "book", attributes: ["name"] },
+      ],
+    });
+
+    res.json({ code: 1, data: items });
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
+
 router.route("/:id").get(async (req, res) => {
   try {
     const item = await OrderItem.findByPk(req.params.id, {
@@ -54,7 +79,15 @@ router.route("/:id").get(async (req, res) => {
           as: "book",
           attributes: ["name", "author", "edition", "publisher", "isbn"],
         },
-        { model: ReturnPayments, as: "payments" },
+        {
+          model: ReturnPayments,
+          as: "payments",
+          include: {
+            model: User,
+            as: "paidTo",
+            attributes: ["name", "isAdmin"],
+          },
+        },
       ],
     });
     res.json({ code: 1, data: item });
@@ -137,7 +170,7 @@ router
         const buyerTransaction = ReturnPayments.create(
           {
             amount: buyer.amount,
-            receiverType: "SELLER",
+            receiverType: "BUYER",
             paymentMode: buyer.paymentMode,
             paymentRefId: buyer.refId,
             orderItemId: itemId,
