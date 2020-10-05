@@ -333,6 +333,7 @@ router
 
 router.route("/:bookId").get(async (req, res) => {
   try {
+    console.log("here");
     const book = await Book.findByPk(req.params.bookId, {
       attributes: [
         ...Object.keys(Book.rawAttributes),
@@ -353,11 +354,6 @@ router.route("/:bookId").get(async (req, res) => {
 
         { model: BookRent, as: "rent" },
         {
-          model: BookReview,
-          as: "reviews",
-          include: { model: User, as: "user", attributes: ["name"] },
-        },
-        {
           model: SubCategories,
           as: "subCat",
           include: { model: Categories, as: "category" },
@@ -369,6 +365,7 @@ router.route("/:bookId").get(async (req, res) => {
         },
       ],
     });
+    console.log(book);
     res.json({
       code: 1,
       data: book,
