@@ -56,7 +56,10 @@ router.post("/signIn", async (req, res, next) => {
     if (!user) {
       res.status(401).json({ code: 0, auth: false, message: "user not found" });
     }
-    const token = jwt.sign({ id: user.id, type: "user" }, config.jwtSecret);
+    const token = jwt.sign(
+      { id: user.id, type: "user", isAdmin: user.isAdmin },
+      config.jwtSecret
+    );
     res.status(200).send({
       code: 1,
       data: {
@@ -86,7 +89,44 @@ router.post("/adminSignIn", async (req, res, next) => {
     if (!user) {
       res.status(401).json({ code: 0, auth: false, message: "user not found" });
     }
-    const token = jwt.sign({ id: user.id, type: "user" }, config.jwtSecret);
+    const token = jwt.sign(
+      { id: user.id, isAdmin: user.isAdmin },
+      config.jwtSecret
+    );
+    res.status(200).send({
+      code: 1,
+      data: {
+        auth: true,
+        token: token,
+        profile: user,
+        message: "user found & logged in",
+      },
+    });
+  });
+});
+
+router.post("/ambassadorSignIn", async (req, res, next) => {
+  User.findOne({
+    where: {
+      email: req.body.email,
+    },
+  }).then((user) => {
+    if (!user || !user.isAmbassador) {
+      res.status(401).json({ code: 0, auth: false, message: "user not found" });
+    }
+
+    if (!bCrypt.compareSync(req.body.password, user.password)) {
+      res
+        .status(401)
+        .json({ code: 0, auth: false, message: "incorrect password" });
+    }
+    if (!user) {
+      res.status(401).json({ code: 0, auth: false, message: "user not found" });
+    }
+    const token = jwt.sign(
+      { id: user.id, isAmbassador: user.isAmbassador },
+      config.jwtSecret
+    );
     res.status(200).send({
       code: 1,
       data: {

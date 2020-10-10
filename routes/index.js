@@ -8,6 +8,7 @@ const newsLetterRouter = require("./publicRoutes/newsletter");
 
 const isLoggedIn = require("../middleware/userLoggedIn");
 const verifyRole = require("../middleware/verifyRole");
+const isAmbassador = require("../middleware/isAmbassador");
 const { userRoutes: noFoundBooksUserRouter } = require("./BooksNotFound");
 router
   .route("/")
@@ -25,6 +26,7 @@ router.use("/categories", categoriesRouter);
 router.use("/books", booksRouter);
 router.use("/newsletter", newsLetterRouter);
 router.use("/not-found-books", noFoundBooksUserRouter);
+router.use("/ambassador", isAmbassador, require("./studentAmbassador"));
 
 //no-find-book router
 
