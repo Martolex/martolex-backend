@@ -18,6 +18,7 @@ router.use("/returns", returnsRouter);
 router.use("/newsletter", newsletterRouter);
 router.use("/reviews", adminReviewsRouter);
 router.use("/users", UsersRouter);
+router.use("/ambassadors", require("./ambassadors"));
 
 //orders router
 
