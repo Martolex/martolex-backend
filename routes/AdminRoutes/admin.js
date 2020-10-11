@@ -19,10 +19,7 @@ router.use("/newsletter", newsletterRouter);
 router.use("/reviews", adminReviewsRouter);
 router.use("/users", UsersRouter);
 router.use("/ambassadors", require("./ambassadors"));
-<<<<<<< HEAD
 router.use("/colleges", require("./colleges"));
-=======
->>>>>>> f4cb2a5081904b6e0128a59df44949af268a1deb
 
 //orders router
 

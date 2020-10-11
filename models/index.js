@@ -134,6 +134,7 @@ module.exports = {
   BookReview,
   SellerData,
   Tags,
+  AmbassadorDetails,
   BookTags,
   ReturnPayments,
   NewsLetterSubscriber,
