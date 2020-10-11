@@ -18,8 +18,9 @@ App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
 
 const USER_APP = process.env.ORIGIN || "http://localhost:3001";
-const ADMIN_APP = process.env.ADMIN_ORIGIN || "http://localhost:3002";
-const whiteListOrigins = [USER_APP, ADMIN_APP];
+const ADMIN_APP = process.env.ADMIN_ORIGIN || "http://localhost:4000";
+const AMBASSADOR_APP = process.env.AMBASSADOR_ORIGIN || "http://localhost:5000";
+const whiteListOrigins = [USER_APP, ADMIN_APP, AMBASSADOR_APP];
 App.use(
   cors({
     origin: whiteListOrigins,

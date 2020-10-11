@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 
 const router = require("express").Router();
 const bCrypt = require("bcryptjs");
+const AmbassadorDetails = require("../models/AmbassadorDetails");
 
 router.post("/signUp", (req, res) => {
   const { email, password, phone, name } = req.body;
@@ -56,7 +57,10 @@ router.post("/signIn", async (req, res, next) => {
     if (!user) {
       res.status(401).json({ code: 0, auth: false, message: "user not found" });
     }
-    const token = jwt.sign({ id: user.id, type: "user" }, config.jwtSecret);
+    const token = jwt.sign(
+      { id: user.id, type: "user", isAdmin: user.isAdmin },
+      config.jwtSecret
+    );
     res.status(200).send({
       code: 1,
       data: {
@@ -86,7 +90,10 @@ router.post("/adminSignIn", async (req, res, next) => {
     if (!user) {
       res.status(401).json({ code: 0, auth: false, message: "user not found" });
     }
-    const token = jwt.sign({ id: user.id, type: "user" }, config.jwtSecret);
+    const token = jwt.sign(
+      { id: user.id, isAdmin: user.isAdmin },
+      config.jwtSecret
+    );
     res.status(200).send({
       code: 1,
       data: {
@@ -97,5 +104,54 @@ router.post("/adminSignIn", async (req, res, next) => {
       },
     });
   });
+});
+
+router.post("/ambassadorSignIn", async (req, res, next) => {
+  AmbassadorDetails.findOne({
+    where: { isActive: true },
+    include: {
+      model: User,
+      as: "user",
+      where: {
+        email: req.body.email,
+      },
+      attributes: ["id", "name", "email", "phoneNo", "password"],
+      required: true,
+    },
+  })
+    .then((ambassador) => {
+      console.log(ambassador);
+      if (!ambassador || !ambassador.isActive) {
+        res
+          .status(401)
+          .json({ code: 0, auth: false, message: "user not found" });
+      }
+
+      if (!bCrypt.compareSync(req.body.password, ambassador.user.password)) {
+        res
+          .status(401)
+          .json({ code: 0, auth: false, message: "incorrect password" });
+      }
+
+      const token = jwt.sign(
+        {
+          id: ambassador.user.id,
+          isAmbassador: ambassador.user.isAmbassador,
+          ambassadorId: ambassador.id,
+        },
+        config.jwtSecret
+      );
+      const { password, ...userProfile } = ambassador.toJSON().user;
+      res.status(200).send({
+        code: 1,
+        data: {
+          auth: true,
+          token: token,
+          profile: userProfile,
+          message: "user authenticated and authorized",
+        },
+      });
+    })
+    .catch((err) => console.log(err));
 });
 module.exports = router;

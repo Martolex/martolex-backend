@@ -27,6 +27,7 @@ router.route("/").get(async (req, res) => {
 });
 
 router.route("/new").post(async (req, res) => {
+<<<<<<< HEAD
   console.log(req.body);
   if (!req.body.collegeId || !req.body.userId || req.body.isActive) {
     res.status(400).json({ code: 0, message: "bad request" });
@@ -46,11 +47,31 @@ router.route("/new").post(async (req, res) => {
         } else if (err.fields[0] == "collegeId") {
           res.json({ code: 0, message: "invalid College" });
         }
+=======
+  if (!req.body.collegeId || !req.body.userId || req.body.isActive) {
+    res.status(400).json({ code: 0, message: "bad request" });
+  }
+  try {
+    await AmbassadorDetails.create({ ...req.body });
+    res.json({ code: 1, data: { message: "created" } });
+  } catch (err) {
+    console.log(err);
+    if (err instanceof ValidationError) {
+      if (err.errors[0].type == "unique violation")
+        res.json({ code: 0, message: "ambassador exists" });
+      else res.json({ code: 0, message: err.errors[0].message });
+    } else if (err instanceof ForeignKeyConstraintError) {
+      if (err.fields[0] == "userId") {
+        res.json({ code: 0, message: "invalid user" });
+      } else if (err.fields[0] == "collegeId") {
+        res.json({ code: 0, message: "invalid College" });
+>>>>>>> f4cb2a5081904b6e0128a59df44949af268a1deb
       }
     }
   }
 });
 
+<<<<<<< HEAD
 router.route("/isValidCandidate").get(async (req, res) => {
   const { email } = req.query;
   const user = await User.findOne({
@@ -72,6 +93,8 @@ router.route("/isValidCandidate").get(async (req, res) => {
   });
 });
 
+=======
+>>>>>>> f4cb2a5081904b6e0128a59df44949af268a1deb
 router.route("/deactivate").post(async (req, res) => {
   if (!req.body.ambassadorId) {
     res.status(400).json({ code: 0, message: "bad request" });
