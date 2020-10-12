@@ -32,7 +32,8 @@ router.route("/new").post(async (req, res) => {
     res.status(400).json({ code: 0, message: "bad request" });
   } else {
     try {
-      await AmbassadorDetails.create({ ...req.body });
+      AmbassadorDetails.create({ ...req.body });
+      User.update({ isAmbassador: true }, { where: { id: req.body.userId } });
       res.json({ code: 1, data: { message: "created" } });
     } catch (err) {
       console.log(err);
