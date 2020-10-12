@@ -120,7 +120,6 @@ router.post("/ambassadorSignIn", async (req, res, next) => {
     },
   })
     .then((ambassador) => {
-      console.log(ambassador);
       if (!ambassador || !ambassador.isActive) {
         res
           .status(401)
@@ -136,7 +135,7 @@ router.post("/ambassadorSignIn", async (req, res, next) => {
       const token = jwt.sign(
         {
           id: ambassador.user.id,
-          isAmbassador: ambassador.user.isAmbassador,
+          isAmbassador: true,
           ambassadorId: ambassador.id,
         },
         config.jwtSecret
