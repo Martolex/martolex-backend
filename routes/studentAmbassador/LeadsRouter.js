@@ -67,7 +67,7 @@ router.route("/newLead").post(async (req, res) => {
         if (errors.length > 0) {
           res.json({ code: 1, data: { errors: { duplicates: errors } } });
         } else {
-          res.json({ code: 0, data: { message: "leads added successfully" } });
+          res.json({ code: 1, data: { message: "leads added successfully" } });
         }
       }
     }
