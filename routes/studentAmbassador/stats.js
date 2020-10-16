@@ -14,28 +14,34 @@ router.route("/").get(async (req, res) => {
     format((sum(rent+deposit)) * ${commisionRate} ,2) as totalEarning,
     format(sum(if(NOW() - INTERVAL 1 MONTH < orderDate, rent+deposit , 0))*${commisionRate} , 2) as oneMonthEarning
     from (
-        select l.ambassador ,o.createdAt as orderDate,
+        select l.ambassador ,o.createdAt as orderDate,o.referralCode,
         oi.bookId ,oi.qty, oi.rent , oi.deposit ,
         u.email, u.name , u.phoneNo,
         l.createdAt as leadCreationDate
-        from Orders o inner join orderItems oi inner join Users u INNER join Leads l 
-        on o.id = oi.orderId and o.userId = u.id and u.email = l.email WHERE l.ambassador='${req.user.ambassadorId}'
-        ) as od WHERE time_to_sec(timediff(orderDate , leadCreationDate)) > 0 GROUP BY ambassador order by orderDate DESC`;
+        from Orders o inner join orderItems oi inner join Users u 
+        on o.id = oi.orderId and o.userId = u.id 
+        LEFT OUTER JOIN Leads l 
+        on u.email = l.email WHERE 
+        l.ambassador='${req.user.ambassadorId}' OR o.referralCode = (SELECT referralCode from AmbassadorDetails where id='${req.user.ambassadorId}')
+        ) as od WHERE time_to_sec(timediff(orderDate , leadCreationDate)) > 0 OR referralCode IS NOT NULL 
+        ORDER BY orderDate DESC`;
 
   const chartsQuery = `SELECT
 
         FORMAT((SUM(rent+deposit)) * ${commisionRate} ,2) as earning,
         MONTH(orderDate) as month,YEAR(orderDate) as year
         FROM (
-            select l.ambassador ,o.createdAt as orderDate,
+            select l.ambassador ,o.createdAt as orderDate,o.referralCode,
             oi.bookId ,oi.qty, oi.rent , oi.deposit ,
             u.email, u.name , u.phoneNo,
             l.createdAt as leadCreationDate
-            from Orders o INNER JOIN orderItems oi INNER JOIN Users u INNER JOIN Leads l 
-            on o.id = oi.orderId and o.userId = u.id and u.email = l.email 
-            WHERE l.ambassador='${req.user.ambassadorId}' and 
+            from Orders o INNER JOIN orderItems oi INNER JOIN Users u 
+            on o.id = oi.orderId and o.userId = u.id
+            LEFT OUTER JOIN Leads l 
+            on u.email = l.email 
+            WHERE (l.ambassador='${req.user.ambassadorId}' OR o.referralCode = (select referralCode from AmbassadorDetails where id='${req.user.ambassadorId}')) and 
             o.createdAt >  DATE_SUB(NOW() - INTERVAL 1 YEAR,INTERVAL DAYOFMONTH(NOW() - INTERVAL 1 YEAR)-1 DAY)
-            ) as od WHERE time_to_sec(timediff(orderDate , leadCreationDate)) > 0 
+            ) as od WHERE time_to_sec(timediff(orderDate , leadCreationDate)) > 0  or referralCode IS NOT NULL
             GROUP BY MONTH(orderDate),YEAR(orderDate)
             ORDER BY orderDate ASC`;
   try {
