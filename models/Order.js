@@ -16,6 +16,9 @@ Order.init(
       isIn: [Object.values(paymentStatus)],
       defaultValue: paymentStatus.PENDING,
     },
+    referralCode: {
+      type: DataTypes.STRING(6),
+    },
     orderStatus: {
       type: DataTypes.STRING,
       isIn: [Object.values(orderStatus)],

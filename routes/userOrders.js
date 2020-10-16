@@ -77,6 +77,7 @@ router.route("/cod").post(async (req, res) => {
 
           userId: req.user.id,
           userAddress: address,
+          referralCode: req.body.referralCode,
           deliveryAmount: req.body.deliveryAmount,
           deliveryMinDate: new Date().getTime() + 5 * 24 * 60 * 60 * 1000,
           deliveryMaxDate: new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
