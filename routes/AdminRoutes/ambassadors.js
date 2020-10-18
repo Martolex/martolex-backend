@@ -1,7 +1,17 @@
 const AmbassadorDetails = require("../../models/AmbassadorDetails");
 const { Colleges, User } = require("../../models");
 const { ValidationError, ForeignKeyConstraintError } = require("sequelize");
+const ambassadorRoutes = require("../studentAmbassador");
 const router = require("express").Router();
+router.use(
+  "/:id",
+  (req, res, next) => {
+    console.log(req.params);
+    req.user.ambassadorId = req.params.id;
+    next();
+  },
+  ambassadorRoutes
+);
 
 router.route("/").get(async (req, res) => {
   const query = { isActive: true };
