@@ -1,11 +1,12 @@
 const router = require("express").Router();
 const authRouter = require("./auth");
 const userRouter = require("./user");
+const sellerRouter = require("./sellerRoutes");
 const adminRouter = require("./AdminRoutes/admin");
 const categoriesRouter = require("./publicRoutes/categoriesRouter");
 const booksRouter = require("./publicRoutes/Books");
 const newsLetterRouter = require("./publicRoutes/newsletter");
-
+const isSeller = require("../middleware/isSeller");
 const isLoggedIn = require("../middleware/userLoggedIn");
 const verifyRole = require("../middleware/verifyRole");
 const isAmbassador = require("../middleware/isAmbassador");
@@ -26,8 +27,9 @@ router.use("/categories", categoriesRouter);
 router.use("/books", booksRouter);
 router.use("/newsletter", newsLetterRouter);
 router.use("/not-found-books", noFoundBooksUserRouter);
+
+router.use("/seller", isSeller, sellerRouter);
 router.use("/ambassador", isAmbassador, require("./studentAmbassador"));
 
-//no-find-book router
 
 module.exports = router;

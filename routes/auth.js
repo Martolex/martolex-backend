@@ -58,7 +58,12 @@ router.post("/signIn", async (req, res, next) => {
       res.status(401).json({ code: 0, auth: false, message: "user not found" });
     }
     const token = jwt.sign(
-      { id: user.id, type: "user", isAdmin: user.isAdmin },
+      {
+        id: user.id,
+        type: "user",
+        isAdmin: user.isAdmin,
+        isSeller: user.isSeller,
+      },
       config.jwtSecret
     );
     res.status(200).send({
