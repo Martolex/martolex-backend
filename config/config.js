@@ -9,7 +9,7 @@ const config = {
   port: process.env.PORT || 3000,
   protocol: process.env.PROTOCOL || "http://",
   jwtSecret: process.env.jwtSecret || "martolexjwttoken",
-  imagesS3Bucket: process.env.IMG_S3_BUCKET || "martolex-book-images",
+  imagesS3Bucket: process.env.IMG_S3_BUCKET || "martolex-book-images-test",
   maxSessionAge: 30 * 24 * 60 * 60 * 1000,
   sessionCleanupInterval: 15 * 60 * 1000,
   defaultLimit: 10,

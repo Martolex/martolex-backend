@@ -19,12 +19,46 @@ const {
 const { route } = require("./auth");
 const config = require("../config/config");
 const buildPaginationUrls = require("../utils/buildPaginationUrls");
-const { Sequelize, where } = require("sequelize");
+const { Sequelize, where, Op } = require("sequelize");
 const { getReturnDate } = require("../utils/orderUtils");
 const router = require("express").Router();
 const AWS = require("aws-sdk");
 AWS.config.update({ region: "ap-south-1" });
 const Lambda = new AWS.Lambda();
+
+const getGroupedItems = async (items) => {
+  try {
+    const promises = items.map((item) =>
+      Book.findByPk(item.bookId, {
+        attributes: ["id", "uploader"],
+        include: { model: User, as: "upload", attributes: ["isAdmin", "id"] },
+      })
+    );
+    const books = await Promise.all(promises);
+    const grouped = books.reduce(
+      (grouped, book, idx) =>
+        grouped[book.upload.id]
+          ? {
+              ...grouped,
+              [grouped[book.upload.id]]: {
+                ...grouped[book.upload.id],
+                items: [...grouped[book.upload.id].items, items[idx]],
+              },
+            }
+          : {
+              ...grouped,
+              [grouped[book.upload.id]]: {
+                isThirdparty: !book.upload.isAdmin,
+                items: [items[idx]],
+              },
+            },
+      {}
+    );
+    return grouped;
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 router.route("/cod").post(async (req, res) => {
   try {
@@ -65,48 +99,53 @@ router.route("/cod").post(async (req, res) => {
             : returnStates.NOT_RETURNED,
       }));
 
-      const items = await OrderItem.bulkCreate(itemsList, {
-        transaction: t,
-      });
+      const groupedItems = await getGroupedItems(itemsList);
 
-      Cart.destroy({ where: { userId: req.user.id } });
+      const Orderpromises = Object.values(groupedItems).map(async ({itemsList , isThirdparty}) => {
+        const items = await OrderItem.bulkCreate(itemsList, {
+          transaction: t,
+        });
 
-      let order = await Order.create(
-        {
-          paymentMode: paymentModes.COD,
+        let order = await Order.create(
+          {
+            paymentMode: paymentModes.COD,
 
-          userId: req.user.id,
-          userAddress: address,
-          referralCode: req.body.referralCode,
-          deliveryAmount: req.body.deliveryAmount,
-          deliveryMinDate: new Date().getTime() + 5 * 24 * 60 * 60 * 1000,
-          deliveryMaxDate: new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
-        },
-        { transaction: t }
-      );
-      order.setAddress(address);
-      order.setItems(items);
-      return order;
-    });
-    if (config.env != "dev") {
-      const params = {
-        FunctionName: "email-service", // the lambda function we are going to invoke
-        InvocationType: "RequestResponse",
-        Payload: `{ "orderId" : "${result.id}" }`,
-      };
-      console.log("executing");
-      Lambda.invoke(params, (err, data) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log(data);
+            userId: req.user.id,
+            userAddress: address,
+            referralCode: req.body.referralCode,
+            deliveryAmount: !isThirdparty? req.body.deliveryAmount : 0,
+            deliveryMinDate: new Date().getTime() + 5 * 24 * 60 * 60 * 1000,
+            deliveryMaxDate: new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
+          },
+          { transaction: t }
+        );
+        order.setAddress(address);
+        order.setItems(items);
+        if (config.env != "dev") {
+          const params = {
+            FunctionName: "email-service",
+            InvocationType: "RequestResponse",
+            Payload: `{ "orderId" : "${order.id}" }`,
+          };
+          console.log("executing");
+          Lambda.invoke(params, (err, data) => {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log(data);
+            }
+          });
         }
+        return order.id;
       });
-    }
+      return await Promise.all(Orderpromises);
+    });
+    
+    Cart.destroy({ where: { userId: req.user.id } });
 
     res.json({
       code: 1,
-      data: { message: "Order created successfully", orderId: result.id },
+      data: { message: "Order created successfully", orderIds: result },
     });
   } catch (err) {
     console.log(err);
