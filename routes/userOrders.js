@@ -145,7 +145,7 @@ router.route("/cod").post(async (req, res) => {
       return await Promise.all(Orderpromises);
     });
     
-    // Cart.destroy({ where: { userId: req.user.id } });
+    Cart.destroy({ where: { userId: req.user.id } });
 
     res.json({
       code: 1,
