@@ -1,5 +1,5 @@
 const passport = require("passport");
-const { User } = require("../models");
+const { User, Colleges } = require("../models");
 const { config } = require("../config/config");
 const jwt = require("jsonwebtoken");
 
@@ -58,7 +58,12 @@ router.post("/signIn", async (req, res, next) => {
       res.status(401).json({ code: 0, auth: false, message: "user not found" });
     }
     const token = jwt.sign(
-      { id: user.id, type: "user", isAdmin: user.isAdmin },
+      {
+        id: user.id,
+        type: "user",
+        isAdmin: user.isAdmin,
+        isSeller: user.isSeller,
+      },
       config.jwtSecret
     );
     res.status(200).send({
@@ -109,48 +114,50 @@ router.post("/adminSignIn", async (req, res, next) => {
 router.post("/ambassadorSignIn", async (req, res, next) => {
   AmbassadorDetails.findOne({
     where: { isActive: true },
-    include: {
-      model: User,
-      as: "user",
-      where: {
-        email: req.body.email,
+    include: [
+      {
+        model: User,
+        as: "user",
+        where: {
+          email: req.body.email,
+        },
+        attributes: ["id", "name", "email", "phoneNo", "password"],
+        required: true,
       },
-      attributes: ["id", "name", "email", "phoneNo", "password"],
-      required: true,
-    },
+      { model: Colleges, as: "college", attributes: ["name", "id"] },
+    ],
   })
     .then((ambassador) => {
-      console.log(ambassador);
       if (!ambassador || !ambassador.isActive) {
         res
           .status(401)
           .json({ code: 0, auth: false, message: "user not found" });
-      }
-
-      if (!bCrypt.compareSync(req.body.password, ambassador.user.password)) {
+      } else if (
+        !bCrypt.compareSync(req.body.password, ambassador.user.password)
+      ) {
         res
           .status(401)
           .json({ code: 0, auth: false, message: "incorrect password" });
+      } else {
+        const token = jwt.sign(
+          {
+            id: ambassador.user.id,
+            isAmbassador: true,
+            ambassadorId: ambassador.id,
+          },
+          config.jwtSecret
+        );
+        const { password, ...userProfile } = ambassador.toJSON().user;
+        res.status(200).send({
+          code: 1,
+          data: {
+            auth: true,
+            token: token,
+            profile: { ...userProfile, college: ambassador.college },
+            message: "user authenticated and authorized",
+          },
+        });
       }
-
-      const token = jwt.sign(
-        {
-          id: ambassador.user.id,
-          isAmbassador: ambassador.user.isAmbassador,
-          ambassadorId: ambassador.id,
-        },
-        config.jwtSecret
-      );
-      const { password, ...userProfile } = ambassador.toJSON().user;
-      res.status(200).send({
-        code: 1,
-        data: {
-          auth: true,
-          token: token,
-          profile: userProfile,
-          message: "user authenticated and authorized",
-        },
-      });
     })
     .catch((err) => console.log(err));
 });

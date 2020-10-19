@@ -1,7 +1,17 @@
 const AmbassadorDetails = require("../../models/AmbassadorDetails");
 const { Colleges, User } = require("../../models");
 const { ValidationError, ForeignKeyConstraintError } = require("sequelize");
+const ambassadorRoutes = require("../studentAmbassador");
 const router = require("express").Router();
+router.use(
+  "/:id",
+  (req, res, next) => {
+    console.log(req.params);
+    req.user.ambassadorId = req.params.id;
+    next();
+  },
+  ambassadorRoutes
+);
 
 router.route("/").get(async (req, res) => {
   const query = { isActive: true };
@@ -27,26 +37,50 @@ router.route("/").get(async (req, res) => {
 });
 
 router.route("/new").post(async (req, res) => {
+  console.log(req.body);
   if (!req.body.collegeId || !req.body.userId || req.body.isActive) {
     res.status(400).json({ code: 0, message: "bad request" });
-  }
-  try {
-    await AmbassadorDetails.create({ ...req.body });
-    res.json({ code: 1, data: { message: "created" } });
-  } catch (err) {
-    console.log(err);
-    if (err instanceof ValidationError) {
-      if (err.errors[0].type == "unique violation")
-        res.json({ code: 0, message: "ambassador exists" });
-      else res.json({ code: 0, message: err.errors[0].message });
-    } else if (err instanceof ForeignKeyConstraintError) {
-      if (err.fields[0] == "userId") {
-        res.json({ code: 0, message: "invalid user" });
-      } else if (err.fields[0] == "collegeId") {
-        res.json({ code: 0, message: "invalid College" });
+  } else {
+    try {
+      AmbassadorDetails.create({ ...req.body });
+      User.update({ isAmbassador: true }, { where: { id: req.body.userId } });
+      res.json({ code: 1, data: { message: "created" } });
+    } catch (err) {
+      console.log(err);
+      if (err instanceof ValidationError) {
+        if (err.errors[0].type == "unique violation")
+          res.json({ code: 0, message: "ambassador exists" });
+        else res.json({ code: 0, message: err.errors[0].message });
+      } else if (err instanceof ForeignKeyConstraintError) {
+        if (err.fields[0] == "userId") {
+          res.json({ code: 0, message: "invalid user" });
+        } else if (err.fields[0] == "collegeId") {
+          res.json({ code: 0, message: "invalid College" });
+        }
       }
     }
   }
+});
+
+router.route("/isValidCandidate").get(async (req, res) => {
+  const { email } = req.query;
+  const user = await User.findOne({
+    attributes: ["id"],
+    where: { email },
+    include: {
+      model: AmbassadorDetails,
+      as: "ambassador",
+      required: false,
+      attributes: ["id"],
+    },
+  });
+  res.json({
+    code: 1,
+    data: {
+      isValid: user ? !user.ambassador : false,
+      id: user && user.id,
+    },
+  });
 });
 
 router.route("/deactivate").post(async (req, res) => {

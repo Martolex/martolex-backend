@@ -28,8 +28,7 @@ Book.init(
     description: { type: DataTypes.TEXT },
     isApproved: {
       type: DataTypes.INTEGER,
-      defaultValue: approvalStates.PENDING,
-      validate: { isIn: [Object.values(approvalStates)] },
+      defaultValue: 0,
     },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
     isBuyBackEnabled: { type: DataTypes.BOOLEAN, defaultValue: true },

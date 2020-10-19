@@ -17,6 +17,7 @@ const ReturnPayments = require("./ReturnPayments");
 const NewsLetterSubscriber = require("./NewsLetterSubscriber");
 const Colleges = require("./Colleges");
 const AmbassadorDetails = require("./AmbassadorDetails");
+const Leads = require("./Leads");
 
 Book.belongsTo(BookRent, {
   foreignKey: "rentId",
@@ -103,6 +104,8 @@ User.hasMany(ReturnPayments, {
   as: "paymentsReceived",
 });
 
+//ambassadors
+
 AmbassadorDetails.belongsTo(User, {
   foreignKey: "userId",
   as: "user",
@@ -119,6 +122,15 @@ AmbassadorDetails.belongsTo(Colleges, {
   as: "college",
 });
 
+Leads.belongsTo(Colleges, { foreignKey: "collegeId", as: "college" });
+Colleges.hasMany(Leads, { foreignKey: "collegeId", as: "leads" });
+
+Leads.belongsTo(AmbassadorDetails, {
+  foreignKey: "ambassador",
+  as: "approachedBy",
+});
+AmbassadorDetails.hasMany(Leads, { foreignKey: "ambassador", as: "leads" });
+
 module.exports = {
   BookRent,
   BookImages,
@@ -134,6 +146,8 @@ module.exports = {
   BookReview,
   SellerData,
   Tags,
+  Leads,
+  AmbassadorDetails,
   BookTags,
   ReturnPayments,
   NewsLetterSubscriber,
