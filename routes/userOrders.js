@@ -35,19 +35,21 @@ const getGroupedItems = async (items) => {
       })
     );
     const books = await Promise.all(promises);
+    console.log(books.map((book) => book.upload.id));
+    
     const grouped = books.reduce(
       (grouped, book, idx) =>
         grouped[book.upload.id]
           ? {
               ...grouped,
-              [grouped[book.upload.id]]: {
+              [book.upload.id]: {
                 ...grouped[book.upload.id],
                 items: [...grouped[book.upload.id].items, items[idx]],
               },
             }
           : {
               ...grouped,
-              [grouped[book.upload.id]]: {
+              [book.upload.id]: {
                 isThirdparty: !book.upload.isAdmin,
                 items: [items[idx]],
               },
@@ -101,47 +103,49 @@ router.route("/cod").post(async (req, res) => {
 
       const groupedItems = await getGroupedItems(itemsList);
 
-      const Orderpromises = Object.values(groupedItems).map(async ({itemsList , isThirdparty}) => {
-        const items = await OrderItem.bulkCreate(itemsList, {
-          transaction: t,
-        });
-
-        let order = await Order.create(
-          {
-            paymentMode: paymentModes.COD,
-
-            userId: req.user.id,
-            userAddress: address,
-            referralCode: req.body.referralCode,
-            deliveryAmount: !isThirdparty? req.body.deliveryAmount : 0,
-            deliveryMinDate: new Date().getTime() + 5 * 24 * 60 * 60 * 1000,
-            deliveryMaxDate: new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
-          },
-          { transaction: t }
-        );
-        order.setAddress(address);
-        order.setItems(items);
-        if (config.env != "dev") {
-          const params = {
-            FunctionName: "email-service",
-            InvocationType: "RequestResponse",
-            Payload: `{ "orderId" : "${order.id}" }`,
-          };
-          console.log("executing");
-          Lambda.invoke(params, (err, data) => {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log(data);
-            }
+      const Orderpromises = Object.values(groupedItems).map(
+        async ({ items : itemList, isThirdparty }) => {
+          const items = await OrderItem.bulkCreate(itemList, {
+            transaction: t,
           });
+
+          let order = await Order.create(
+            {
+              paymentMode: paymentModes.COD,
+
+              userId: req.user.id,
+              userAddress: address,
+              referralCode: req.body.referralCode,
+              deliveryAmount: !isThirdparty ? req.body.deliveryAmount : 0,
+              deliveryMinDate: new Date().getTime() + 5 * 24 * 60 * 60 * 1000,
+              deliveryMaxDate: new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
+            },
+            { transaction: t }
+          );
+          order.setAddress(address);
+          order.setItems(items);
+          if (config.env != "dev") {
+            const params = {
+              FunctionName: "email-service",
+              InvocationType: "RequestResponse",
+              Payload: `{ "orderId" : "${order.id}" }`,
+            };
+            console.log("executing");
+            Lambda.invoke(params, (err, data) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(data);
+              }
+            });
+          }
+          return order.id;
         }
-        return order.id;
-      });
+      );
       return await Promise.all(Orderpromises);
     });
     
-    Cart.destroy({ where: { userId: req.user.id } });
+    // Cart.destroy({ where: { userId: req.user.id } });
 
     res.json({
       code: 1,
@@ -192,7 +196,7 @@ router.route("/").get(async (req, res) => {
     });
     res.json({
       code: 1,
-      data: orders,
+      data: orders, 
     });
   } catch (err) {
     console.log(err);

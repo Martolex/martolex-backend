@@ -1,8 +1,7 @@
-const { Cart, Book, BookRent, BookImages } = require("../models");
+const { Cart, Book, BookRent, BookImages, User } = require("../models");
 const { config } = require("../config/config");
 const buildPaginationUrls = require("../utils/buildPaginationUrls");
 const { ValidationError, Sequelize, Op } = require("sequelize");
-
 const router = require("express").Router();
 
 router
@@ -156,6 +155,29 @@ router.post("/modifyQty", async (req, res) => {
     } else {
       res.json({ code: 0, message: "something went wrong" });
     }
+  }
+});
+
+router.route("/deliveryCharge").get(async (req, res) => {
+  try {
+    const NoDeliveryCharge = { forward: 0, return: 0 };
+    const cart = await Cart.findAll({
+      where: { userId: req.user.id },
+      attributes: ["id"],
+      include: {
+        model: Book,
+        as: "book",
+        attributes: ["id"],
+        include: { model: User, as: "upload", attributes: ["id", "isAdmin"] },
+      },
+    });
+    if (cart.some((item) => item.book.upload.isAdmin)) {
+      res.json({ code: 1, data: config.deliveryCharge });
+    } else {
+      res.json({ code: 1, data: NoDeliveryCharge });
+    }
+  } catch (err) {
+    res.json({ code: 0, message: "something went wrong" });
   }
 });
 
