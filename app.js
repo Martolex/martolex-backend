@@ -1,4 +1,4 @@
-// require("dotenv").config({ path: "./.env.prod" });
+require("dotenv").config({ path: "./.env.prod" });
 const Express = require("express");
 const App = Express();
 var session = require("express-session");
@@ -30,8 +30,19 @@ App.use(
 
 const models = require("./models/index");
 
+// models.Colleges.bulkCreate([
+//   { name: "KJ SOMAIYA", city: "MUMBAI" },
+//   { name: "COEP", city: "PUNE" },
+// ]).then(() => {
+//   console.log("created");
+// });
+
 if (env == "dev") {
-  // db.sync({ alter: true });
+  // db.sync({ alter: true })
+  //   .then(() => {
+  //     console.log("db synced");
+  //   })
+  //   .catch((err) => console.log(err));
   // sessionStore.sync();
 }
 
