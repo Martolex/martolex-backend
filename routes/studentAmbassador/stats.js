@@ -18,7 +18,7 @@ router.route("/").get(async (req, res) => {
         oi.bookId ,oi.qty, oi.rent , oi.deposit ,
         u.email, u.name , u.phoneNo,
         l.createdAt as leadCreationDate
-        from Orders o inner join orderItems oi inner join Users u 
+        from Orders o inner join OrderItems oi inner join Users u 
         on o.id = oi.orderId and o.userId = u.id 
         LEFT OUTER JOIN Leads l 
         on u.email = l.email WHERE 
@@ -35,7 +35,7 @@ router.route("/").get(async (req, res) => {
             oi.bookId ,oi.qty, oi.rent , oi.deposit ,
             u.email, u.name , u.phoneNo,
             l.createdAt as leadCreationDate
-            from Orders o INNER JOIN orderItems oi INNER JOIN Users u 
+            from Orders o INNER JOIN OrderItems oi INNER JOIN Users u 
             on o.id = oi.orderId and o.userId = u.id
             LEFT OUTER JOIN Leads l 
             on u.email = l.email 
