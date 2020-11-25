@@ -139,6 +139,9 @@ router.route("/cod").post(async (req, res) => {
               }
             });
           }
+          if (isThirdparty) {
+            //send sms to seller and buyer for details
+          }
           return order.id;
         }
       );
