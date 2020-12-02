@@ -13,7 +13,6 @@ const { config } = require("../../config/config");
 const buildPaginationUrls = require("../../utils/buildPaginationUrls");
 const db = require("../../config/db");
 const sequelize = require("../../config/db");
-const { query } = require("../../config/db");
 const router = require("express").Router();
 
 router.route("/search").get(async (req, res) => {

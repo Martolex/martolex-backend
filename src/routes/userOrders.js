@@ -36,7 +36,7 @@ const getGroupedItems = async (items) => {
     );
     const books = await Promise.all(promises);
     console.log(books.map((book) => book.upload.id));
-    
+
     const grouped = books.reduce(
       (grouped, book, idx) =>
         grouped[book.upload.id]
@@ -104,7 +104,7 @@ router.route("/cod").post(async (req, res) => {
       const groupedItems = await getGroupedItems(itemsList);
 
       const Orderpromises = Object.values(groupedItems).map(
-        async ({ items : itemList, isThirdparty }) => {
+        async ({ items: itemList, isThirdparty }) => {
           const items = await OrderItem.bulkCreate(itemList, {
             transaction: t,
           });
@@ -147,7 +147,7 @@ router.route("/cod").post(async (req, res) => {
       );
       return await Promise.all(Orderpromises);
     });
-    
+
     Cart.destroy({ where: { userId: req.user.id } });
 
     res.json({
@@ -199,7 +199,7 @@ router.route("/").get(async (req, res) => {
     });
     res.json({
       code: 1,
-      data: orders, 
+      data: orders,
     });
   } catch (err) {
     console.log(err);
