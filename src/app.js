@@ -17,13 +17,9 @@ AWS.config.update({
 App.use(bodyParser.json());
 App.use(bodyParser.urlencoded({ extended: true }));
 
-const USER_APP = process.env.ORIGIN || "http://localhost:3001";
-const ADMIN_APP = process.env.ADMIN_ORIGIN || "http://localhost:4000";
-const AMBASSADOR_APP = process.env.AMBASSADOR_ORIGIN || "http://localhost:5000";
-const whiteListOrigins = [USER_APP, ADMIN_APP, AMBASSADOR_APP];
 App.use(
   cors({
-    origin: whiteListOrigins,
+    origin: Object.values(config.applications),
     credentials: true,
   })
 );
@@ -36,9 +32,9 @@ const models = require("./models/index");
 // ]).then(() => {
 //   console.log("created");
 // });
-
+//
 if (env == "dev") {
-  // db.sync({ alter: true })
+  db.sync({ alter: true });
   //   .then(() => {
   //     console.log("db synced");
   //   })

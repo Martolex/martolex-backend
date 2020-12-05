@@ -1,4 +1,7 @@
 const env = process.env.NODE_ENV || "dev";
+const USER_APP = process.env.ORIGIN || "http://localhost:3001";
+const ADMIN_APP = process.env.ADMIN_ORIGIN || "http://localhost:4000";
+const AMBASSADOR_APP = process.env.AMBASSADOR_ORIGIN || "http://localhost:5000";
 const config = {
   dbName: process.env.DBNAME || "martolex-new",
   dbHost: process.env.DBHOST || "localhost",
@@ -14,5 +17,6 @@ const config = {
   sessionCleanupInterval: 15 * 60 * 1000,
   defaultLimit: 10,
   deliveryCharge: { forward: 30, return: 0 },
+  applications: { USER_APP, ADMIN_APP, AMBASSADOR_APP },
 };
 module.exports = { config: config, env };
