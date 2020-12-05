@@ -7,7 +7,7 @@ router.route("/").post(async (req, res) => {
   const paymentDetails = req.body;
   const USER_APP = `${config.applications.USER_APP}/order`;
   if (paymentDetails.txStatus == "SUCCESS") {
-    const ordersUpdate = Order.update(
+    Order.update(
       {
         paymentStatus: paymentStatus.PAID,
         gatewayRefId: paymentDetails.referenceId,
@@ -24,10 +24,10 @@ router.route("/").post(async (req, res) => {
     const orderIdsQueryString = querystring.stringify({
       orders: orderIds,
     });
-    const redirectURL = `${USER_APP}/confirmation?${orderIdsQueryString}`;
+    redirectURL = `${USER_APP}/confirmation?${orderIdsQueryString}`;
     res.status(302).redirect(redirectURL);
   } else {
-    const redirectURL = `${USER_APP}/failure`;
+    redirectURL = `${USER_APP}/failure`;
   }
   res.status(302).redirect(redirectURL);
 });

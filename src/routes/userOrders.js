@@ -97,7 +97,10 @@ router.route("/create").post(async (req, res) => {
           )
         )
       );
-      const orderTotal = OrderTotal(req.body.items) + config.deliveryCharge;
+      const orderTotal =
+        OrderTotal(req.body.items) +
+        config.deliveryCharge.forward +
+        config.deliveryCharge.return;
       const itemsList = req.body.items.map((item) => ({
         ...item,
         returnDate: getReturnDate(item.plan),
@@ -123,7 +126,9 @@ router.route("/create").post(async (req, res) => {
               userAddress: address,
               gatewayOrderId: gatewayOrderId,
               referralCode: req.body.referralCode,
-              deliveryAmount: !isThirdparty ? config.deliveryCharges : 0,
+              deliveryAmount: !isThirdparty
+                ? config.deliveryCharge.forward + config.deliveryCharge.return
+                : 0,
               deliveryMinDate: new Date().getTime() + 5 * 24 * 60 * 60 * 1000,
               deliveryMaxDate: new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
             },
