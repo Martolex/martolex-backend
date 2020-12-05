@@ -3,7 +3,7 @@ const { config } = require("../config/config");
 const { Order } = require("../models");
 const querystring = require("querystring");
 const { paymentStatus } = require("../utils/enums");
-router.route("/").post(async (req, res) => {
+router.route("/verify").post(async (req, res) => {
   const paymentDetails = req.body;
   const USER_APP = `${config.applications.USER_APP}/order`;
   if (paymentDetails.txStatus == "SUCCESS") {

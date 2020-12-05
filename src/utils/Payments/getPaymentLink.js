@@ -1,5 +1,5 @@
 const requests = require("./requests");
-const config = require("./config");
+const { config } = require("../../config/config");
 
 const getPaymentLink = async (
   gatewayOrderId,
@@ -17,7 +17,7 @@ const getPaymentLink = async (
     customerEmail: customerEmail,
     customerName: customerName,
     customerPhone: customerPhone,
-    returnUrl: "http://localhost:3000/payments/",
+    returnUrl: `${config.host}/payments/verify`,
   };
   console.log(data);
 
