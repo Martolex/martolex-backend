@@ -8,7 +8,6 @@ const {
   Cart,
   User,
 } = require("../models");
-const { model } = require("../config/db");
 const OrderItem = require("../models/OrderItem");
 const {
   paymentModes,
@@ -17,12 +16,15 @@ const {
   returnStates,
 } = require("../utils/enums");
 const { route } = require("./auth");
-const config = require("../config/config");
+const { config } = require("../config/config");
 const buildPaginationUrls = require("../utils/buildPaginationUrls");
 const { Sequelize, where, Op } = require("sequelize");
-const { getReturnDate } = require("../utils/orderUtils");
+const { getReturnDate, OrderTotal } = require("../utils/orderUtils");
 const router = require("express").Router();
 const AWS = require("aws-sdk");
+const { v4: UUIDV4 } = require("uuid");
+const getPaymentLink = require("../utils/Payments/getPaymentLink");
+
 AWS.config.update({ region: "ap-south-1" });
 const Lambda = new AWS.Lambda();
 
@@ -62,17 +64,17 @@ const getGroupedItems = async (items) => {
   }
 };
 
-router.route("/cod").post(async (req, res) => {
+router.route("/create").post(async (req, res) => {
   try {
     const result = await sequelize.transaction(async (t) => {
-      let address;
+      let addressPromise;
       if (req.body.addressId) {
-        address = await UserAddress.findByPk(req.body.addressId, {
+        addressPromise = UserAddress.findByPk(req.body.addressId, {
           transaction: t,
         });
         // console.log(address);
       } else {
-        address = await UserAddress.create(
+        addressPromise = UserAddress.create(
           {
             ...req.body.address,
             UserId: req.user.id,
@@ -83,6 +85,10 @@ router.route("/cod").post(async (req, res) => {
         );
       }
 
+      const userPromise = User.findByPk(req.user.id, { attributes: ["email"] });
+
+      const [address, user] = await Promise.all([addressPromise, userPromise]);
+
       await Promise.all(
         req.body.items.map((item) =>
           Book.update(
@@ -91,7 +97,10 @@ router.route("/cod").post(async (req, res) => {
           )
         )
       );
-
+      const orderTotal =
+        OrderTotal(req.body.items) +
+        config.deliveryCharge.forward +
+        config.deliveryCharge.return;
       const itemsList = req.body.items.map((item) => ({
         ...item,
         returnDate: getReturnDate(item.plan),
@@ -102,7 +111,7 @@ router.route("/cod").post(async (req, res) => {
       }));
 
       const groupedItems = await getGroupedItems(itemsList);
-
+      const gatewayOrderId = UUIDV4();
       const Orderpromises = Object.values(groupedItems).map(
         async ({ items: itemList, isThirdparty }) => {
           const items = await OrderItem.bulkCreate(itemList, {
@@ -111,12 +120,15 @@ router.route("/cod").post(async (req, res) => {
 
           let order = await Order.create(
             {
-              paymentMode: paymentModes.COD,
+              paymentMode: paymentModes.CASHFREE,
 
               userId: req.user.id,
               userAddress: address,
+              gatewayOrderId: gatewayOrderId,
               referralCode: req.body.referralCode,
-              deliveryAmount: !isThirdparty ? req.body.deliveryAmount : 0,
+              deliveryAmount: !isThirdparty
+                ? config.deliveryCharge.forward + config.deliveryCharge.return
+                : 0,
               deliveryMinDate: new Date().getTime() + 5 * 24 * 60 * 60 * 1000,
               deliveryMaxDate: new Date().getTime() + 7 * 24 * 60 * 60 * 1000,
             },
@@ -145,14 +157,26 @@ router.route("/cod").post(async (req, res) => {
           return order.id;
         }
       );
-      return await Promise.all(Orderpromises);
+      const orderIds = await Promise.all(Orderpromises);
+      const paymentLink = await getPaymentLink(gatewayOrderId, {
+        orderIds,
+        orderAmount: orderTotal,
+        customerEmail: user.email,
+        customerPhone: address.phoneNo,
+        customerName: address.name,
+      });
+      return { orderIds, paymentLink };
     });
 
-    Cart.destroy({ where: { userId: req.user.id } });
+    // Cart.destroy({ where: { userId: req.user.id } });
 
     res.json({
       code: 1,
-      data: { message: "Order created successfully", orderIds: result },
+      data: {
+        message: "Order created successfully",
+        orderIds: result.orderIds,
+        paymentLink: result.paymentLink,
+      },
     });
   } catch (err) {
     console.log(err);

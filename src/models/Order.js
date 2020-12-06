@@ -24,6 +24,7 @@ Order.init(
       isIn: [Object.values(orderStatus)],
       defaultValue: orderStatus.PROCESSING,
     },
+    gatewayOrderId: { type: DataTypes.STRING },
     gatewayRefId: { type: DataTypes.STRING },
     gateWayMode: { type: DataTypes.STRING },
     deliveryMinDate: { type: DataTypes.DATE },

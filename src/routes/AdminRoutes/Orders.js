@@ -29,10 +29,11 @@ router.route("/").get(async (req, res) => {
     attributes: [
       "id",
       "paymentMode",
-      "orderStatus",
+      "paymentStatus",
       "deliveryAmount",
       "createdAt",
     ],
+    order: [["createdAt", "DESC"]],
     include: [
       {
         model: User,

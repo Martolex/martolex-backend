@@ -9,6 +9,7 @@ const newsLetterRouter = require("./publicRoutes/newsletter");
 const isSeller = require("../middleware/isSeller");
 const isLoggedIn = require("../middleware/userLoggedIn");
 const verifyRole = require("../middleware/verifyRole");
+const paymentsRouter = require("./Payments");
 const isAmbassador = require("../middleware/isAmbassador");
 const { userRoutes: noFoundBooksUserRouter } = require("./BooksNotFound");
 router
@@ -28,8 +29,9 @@ router.use("/books", booksRouter);
 router.use("/newsletter", newsLetterRouter);
 router.use("/not-found-books", noFoundBooksUserRouter);
 
+router.use("/payments", paymentsRouter);
+
 router.use("/seller", isSeller, sellerRouter);
 router.use("/ambassador", isAmbassador, require("./studentAmbassador"));
-
 
 module.exports = router;
