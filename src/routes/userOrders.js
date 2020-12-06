@@ -140,9 +140,8 @@ router.route("/create").post(async (req, res) => {
             const params = {
               FunctionName: "email-service",
               InvocationType: "RequestResponse",
-              Payload: `{ "orderId" : "${order.id}" }`,
+              Payload: `{ "type":"ORDER_RECEIPT" , orderId" : "${order.id}" }`,
             };
-            console.log("executing");
             Lambda.invoke(params, (err, data) => {
               if (err) {
                 console.log(err);
