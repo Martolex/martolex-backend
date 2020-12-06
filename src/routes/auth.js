@@ -9,6 +9,7 @@ const bCrypt = require("bcryptjs");
 const AmbassadorDetails = require("../models/AmbassadorDetails");
 const genPasswordResetLink = require("../utils/genPasswordResetLink");
 const { InvalidTokenError } = require("../Exceptions");
+const sequelize = require("../config/db");
 
 AWS.config.update({ region: "ap-south-1" });
 const Lambda = new AWS.Lambda();
@@ -69,7 +70,11 @@ router.post("/forgot-password/verify-token", async (req, res) => {
       moment(passwordResetRequest.createdAt),
       "seconds"
     );
-    if (timeElapsed < config.resetPasswordTokenExpiry) {
+    console.log(timeElapsed);
+    if (
+      timeElapsed < config.resetPasswordTokenExpiry &&
+      passwordResetRequest.isValid
+    ) {
       res.json({ code: 1, data: { valid: true } });
     } else {
       res.json({ code: 0, message: "link Expired" });
@@ -87,9 +92,8 @@ router.post("/forgot-password/verify-token", async (req, res) => {
 
 router.post("/forgot-password/reset-password", async (req, res) => {
   try {
-    const { token, email, password } = req.body;
+    const { token, password } = req.body;
     if (!token) throw TypeError("no token");
-    if (!email) throw TypeError("no Email");
     if (!password) throw TypeError("no password");
     const passwordResetRequest = await PasswordResetRequests.findByPk(token);
     if (!passwordResetRequest) throw new InvalidTokenError();
@@ -99,11 +103,17 @@ router.post("/forgot-password/reset-password", async (req, res) => {
       bCrypt.genSaltSync(8),
       null
     );
-
-    await User.update(
-      { password: hashedPassword },
-      { where: { id: passwordResetRequest.userId } }
-    );
+    const result = await sequelize.transaction(async (t) => {
+      const userUpdatePromise = User.update(
+        { password: hashedPassword },
+        { where: { id: passwordResetRequest.userId }, transaction: t }
+      );
+      const invalidateLinkPromise = PasswordResetRequests.update(
+        { isValid: false },
+        { where: { id: token }, transaction: t }
+      );
+      return await Promise.all([userUpdatePromise, invalidateLinkPromise]);
+    });
 
     res.json({ code: 1, data: { success: true } });
   } catch (err) {
