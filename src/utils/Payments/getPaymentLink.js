@@ -1,6 +1,6 @@
 const requests = require("./requests");
-const { config } = require("../../config/config");
-
+const { config: AppConfig } = require("../../config/config");
+const config = require("./config");
 const getPaymentLink = async (
   gatewayOrderId,
   { orderIds, orderAmount, customerEmail, customerName, customerPhone }
@@ -17,7 +17,7 @@ const getPaymentLink = async (
     customerEmail: customerEmail,
     customerName: customerName,
     customerPhone: customerPhone,
-    returnUrl: `${config.host}/payments/verify`,
+    returnUrl: `${AppConfig.host}/payments/verify`,
   };
   console.log(data);
 
