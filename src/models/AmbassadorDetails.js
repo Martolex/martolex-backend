@@ -1,7 +1,6 @@
 const db = require("../config/db");
 const { Model, DataTypes, UUIDV4 } = require("sequelize");
-const referralCodeGenerator = require('referral-code-generator')
-
+const referralCodeGenerator = require("referral-code-generator");
 
 class AmbassadorDetails extends Model {}
 AmbassadorDetails.init(
@@ -33,7 +32,10 @@ AmbassadorDetails.init(
     indexes: [{ type: "UNIQUE", fields: ["userId"] }],
     hooks: {
       beforeValidate: (ambassadorDetails) => {
-        ambassadorDetails.referralCode = referralCodeGenerator.alpha('uppercase',6);
+        ambassadorDetails.referralCode = referralCodeGenerator.alpha(
+          "uppercase",
+          6
+        );
       },
     },
   }
