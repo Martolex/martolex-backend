@@ -168,7 +168,7 @@ router.route("/create").post(async (req, res) => {
       return { orderIds, paymentLink };
     });
 
-    // Cart.destroy({ where: { userId: req.user.id } });
+    Cart.destroy({ where: { userId: req.user.id } });
 
     res.json({
       code: 1,
