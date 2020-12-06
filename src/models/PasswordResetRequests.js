@@ -15,6 +15,7 @@ PasswordResetRequests.init(
       allowNull: false,
       validate: { isEmail: true },
     },
+    isValid: { type: DataTypes.BOOLEAN, defaultValue: true },
   },
   {
     sequelize: db,
