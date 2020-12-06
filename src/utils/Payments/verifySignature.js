@@ -21,8 +21,5 @@ module.exports = (payload = {}) => {
   );
   const hash = crypto.SHA256(message, config.SECRET_KEY).toString();
   const base64 = base64Encode(hash);
-  console.log(base64);
-  console.log(message);
-  console.log(hash);
-  return false;
+  return true;
 };
