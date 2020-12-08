@@ -23,15 +23,12 @@ const itemPrice = (item) => {
   const total =
     item.plan === plans.SELL
       ? item.book.rent[item.plan]
-      : item.book.rent[item.plan] + item.book.rent.deposit;
+      : item.book.rent.deposit;
   return total * item.qty;
 };
 
 const OrderTotal = (items) => {
-  return items.reduce(
-    (total, item) => total + item.qty * (item.rent + item.deposit),
-    0
-  );
+  return items.reduce((total, item) => total + item.qty * item.deposit, 0);
 };
 
 module.exports = { getReturnDate, OrderTotal, itemPrice };
