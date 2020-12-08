@@ -18,6 +18,7 @@ const NewsLetterSubscriber = require("./NewsLetterSubscriber");
 const Colleges = require("./Colleges");
 const AmbassadorDetails = require("./AmbassadorDetails");
 const Leads = require("./Leads");
+const PasswordResetRequests = require("./PasswordResetRequests");
 
 Book.belongsTo(BookRent, {
   foreignKey: "rentId",
@@ -54,6 +55,12 @@ SubCategories.belongsTo(Categories, {
   as: "category",
   foreignKey: "parentCategory",
   onDelete: "CASCADE",
+});
+
+PasswordResetRequests.belongsTo(User, { as: "user", foreignKey: "userId" });
+User.hasMany(PasswordResetRequests, {
+  as: "passwordResets",
+  foreignKey: "userId",
 });
 
 Tags.belongsToMany(Book, { through: BookTags, as: "books" });
@@ -152,4 +159,5 @@ module.exports = {
   ReturnPayments,
   NewsLetterSubscriber,
   Colleges,
+  PasswordResetRequests,
 };
