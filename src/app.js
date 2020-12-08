@@ -34,7 +34,7 @@ const models = require("./models/index");
 // });
 //
 if (env == "dev") {
-  db.sync({ alter: true });
+  // db.sync({ alter: true });
   //   .then(() => {
   //     console.log("db synced");
   //   })

@@ -18,5 +18,6 @@ const config = {
   defaultLimit: 10,
   deliveryCharge: { forward: 30, return: 0 },
   applications: { USER_APP, ADMIN_APP, AMBASSADOR_APP },
+  resetPasswordTokenExpiry: 30 * 60,
 };
 module.exports = { config: config, env };
