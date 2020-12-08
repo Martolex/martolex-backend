@@ -2,31 +2,40 @@ const { Cart, Book, BookRent, BookImages, User } = require("../models");
 const { config } = require("../config/config");
 const buildPaginationUrls = require("../utils/buildPaginationUrls");
 const { ValidationError, Sequelize, Op } = require("sequelize");
+const { createCartItem } = require("../models/Mappers/CartItemMapper");
 const router = require("express").Router();
 
 router
   .route("/")
   .get(async (req, res) => {
     try {
-      const cart = await Cart.findAll({
-        where: { userId: req.user.id },
-        order: [["createdAt", "ASC"]],
+      const cart = (
+        await Cart.findAll({
+          where: { userId: req.user.id },
+          order: [["createdAt", "ASC"]],
 
-        include: {
-          model: Book,
-          as: "book",
-          include: [
-            { model: BookRent, as: "rent" },
-            {
-              model: BookImages,
-              attributes: ["url"],
-              as: "images",
-              required: false,
-              where: { isCover: true },
-            },
-          ],
-        },
-      });
+          include: {
+            model: Book,
+            as: "book",
+            attributes: ["name"],
+            include: [
+              { model: BookRent, as: "rent" },
+              {
+                model: BookImages,
+                attributes: ["url"],
+                as: "images",
+                required: false,
+                where: { isCover: true },
+              },
+            ],
+          },
+        })
+      )
+        .map((cartItem) => cartItem.toJSON())
+        .map((item) => {
+          return createCartItem(item);
+        });
+
       res.json({
         code: 1,
         data: cart,
@@ -71,7 +80,10 @@ router
       });
       res.json({
         code: 1,
-        data: { message: "item added successfully to cart", item: newCartItem },
+        data: {
+          message: "item added successfully to cart",
+          item: createCartItem(newCartItem.toJSON()),
+        },
       });
     } catch (err) {
       if (err instanceof ValidationError) {
