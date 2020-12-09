@@ -7,7 +7,11 @@ const {
   Book,
   UserAddress,
 } = require("../../models");
-const { orderStatus } = require("../../utils/enums");
+const {
+  orderStatus,
+  paymentStatus,
+  paymentModes,
+} = require("../../utils/enums");
 const { OrderTotal, validateStatus } = require("../../utils/orderUtils");
 
 const router = require("express").Router();
@@ -124,6 +128,9 @@ router.route("/:id/modifyOrderStatus").post(async (req, res) => {
           order.maxDeliveryDate = new Date(req.body.maxDate);
         } else if (status == orderStatus.DELIVERED) {
           order.actualDeliveryDate = req.body.deliveryDate || new Date();
+          if (order.paymentMode === paymentModes.COD) {
+            order.paymentStatus = paymentStatus.PAID;
+          }
         }
         await order.save();
         res.json({ code: 1, data: { success: true } });
