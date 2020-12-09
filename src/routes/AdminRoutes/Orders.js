@@ -1,3 +1,4 @@
+const { stat } = require("fs");
 const {
   Order,
   User,
@@ -7,7 +8,7 @@ const {
   UserAddress,
 } = require("../../models");
 const { orderStatus } = require("../../utils/enums");
-const { OrderTotal } = require("../../utils/orderUtils");
+const { OrderTotal, validateStatus } = require("../../utils/orderUtils");
 
 const router = require("express").Router();
 
@@ -70,6 +71,7 @@ router.route("/:id").get(async (req, res) => {
       attributes: [
         "id",
         "paymentMode",
+        "paymentStatus",
         "orderStatus",
         "deliveryAmount",
         "createdAt",
@@ -107,6 +109,33 @@ router.route("/:id").get(async (req, res) => {
 
   order.totalAmount = OrderTotal(order.items) + order.deliveryAmount;
   res.json({ code: 1, data: order });
+});
+
+router.route("/:id/modifyOrderStatus").post(async (req, res) => {
+  const orderId = req.params.id;
+  const { status } = req.body;
+  try {
+    const order = await Order.findByPk(orderId);
+    if (order) {
+      if (validateStatus(order.orderStatus, status)) {
+        order.orderStatus = status;
+        if (status == orderStatus.SHIPPED) {
+          order.minDeliveryDate = new Date(req.body.minDate);
+          order.maxDeliveryDate = new Date(req.body.maxDate);
+        } else if (status == orderStatus.DELIVERED) {
+          order.actualDeliveryDate = req.body.deliveryDate || new Date();
+        }
+        await order.save();
+        res.json({ code: 1, data: { success: true } });
+      } else {
+        res.json({ code: 0, message: "status transition invalid" });
+      }
+    } else {
+      res.json({ code: 0, message: "order ID invalid" });
+    }
+  } catch (err) {
+    res.json({ code: 0, message: " something went wrong" });
+  }
 });
 
 module.exports = router;

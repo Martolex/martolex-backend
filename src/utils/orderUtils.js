@@ -1,4 +1,4 @@
-const { plans, planDuration } = require("./enums");
+const { plans, planDuration, orderStatus } = require("./enums");
 
 const returnPeriod = 7 * 24 * 60 * 60 * 1000;
 const getReturnDate = (plan) => {
@@ -31,4 +31,16 @@ const OrderTotal = (items) => {
   return items.reduce((total, item) => total + item.qty * item.deposit, 0);
 };
 
-module.exports = { getReturnDate, OrderTotal, itemPrice };
+const validateStatus = (oldStatus, newStatus) => {
+  console.log(oldStatus, newStatus);
+  if (!Object.values(orderStatus).includes(newStatus)) return false;
+  const precedence = {
+    [orderStatus.PROCESSING]: 1,
+    [orderStatus.SHIPPED]: 2,
+    [orderStatus.DELIVERED]: 3,
+  };
+  if (precedence[newStatus] !== precedence[oldStatus] + 1) return false;
+  return true;
+};
+
+module.exports = { getReturnDate, OrderTotal, itemPrice, validateStatus };
