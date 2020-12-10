@@ -90,13 +90,18 @@ router.route("/deactivate").post(async (req, res) => {
   }
   try {
     const { ambassadorId } = req.body;
-    await sequelize.transaction((t) => {
-      const ambassador = await AmbassadorDetails.findByPk(ambassadorId,{transaction:t});
+    await sequelize.transaction(async (t) => {
+      const ambassador = await AmbassadorDetails.findByPk(ambassadorId, {
+        transaction: t,
+      });
       ambassador.isActive = false;
       ambassador.endDate = new Date();
-      const updateAmbassadorDetails = ambassador.save({transaction:t})
-      const updateUser = User.update({ isAmbassador: false }, {where : {id : ambassador.id},transaction:t});
-      return await Promise.all([updateAmbassadorDetails , updateUser]);
+      const updateAmbassadorDetails = ambassador.save({ transaction: t });
+      const updateUser = User.update(
+        { isAmbassador: false },
+        { where: { id: ambassador.id }, transaction: t }
+      );
+      return await Promise.all([updateAmbassadorDetails, updateUser]);
     });
 
     res.json({ code: 1, data: { message: "ambassador account deactivated" } });
