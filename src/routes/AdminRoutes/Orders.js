@@ -1,4 +1,5 @@
 const { stat } = require("fs");
+const moment = require("moment");
 const {
   Order,
   User,
@@ -143,6 +144,36 @@ router.route("/:id/modifyOrderStatus").post(async (req, res) => {
     }
   } catch (err) {
     res.json({ code: 0, message: " something went wrong" });
+  }
+});
+
+router.route("/:id/modifyDeliveryDates").post(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findByPk(id);
+    if (order) {
+      if (
+        moment(req.body.deliveryMaxDate).diff(
+          moment(req.body.deliveryMinDate),
+          "days"
+        ) > 0
+      ) {
+        order.deliveryMinDate = req.body.deliveryMinDate;
+        order.deliveryMaxDate = req.body.deliveryMaxDate;
+
+        await order.save();
+        res.json({ code: 1, data: { success: true } });
+      } else {
+        res.json({
+          code: 0,
+          message: "min Delivery date cannot be greater than max",
+        });
+      }
+    } else {
+      res.json({ code: 0, message: "invalid orderId" });
+    }
+  } catch (err) {
+    res.json({ code: 0, message: "something went wrong" });
   }
 });
 router.route("/:id/resendPaymentLink").post(async (req, res) => {
