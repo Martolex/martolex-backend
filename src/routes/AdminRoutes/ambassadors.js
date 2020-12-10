@@ -2,6 +2,7 @@ const AmbassadorDetails = require("../../models/AmbassadorDetails");
 const { Colleges, User } = require("../../models");
 const { ValidationError, ForeignKeyConstraintError } = require("sequelize");
 const ambassadorRoutes = require("../studentAmbassador");
+const sequelize = require("../../config/db");
 const router = require("express").Router();
 router.use(
   "/:id",
@@ -89,10 +90,15 @@ router.route("/deactivate").post(async (req, res) => {
   }
   try {
     const { ambassadorId } = req.body;
-    await AmbassadorDetails.update(
-      { isActive: false, endDate: new Date() },
-      { where: { id: ambassadorId } }
-    );
+    await sequelize.transaction((t) => {
+      const ambassador = await AmbassadorDetails.findByPk(ambassadorId,{transaction:t});
+      ambassador.isActive = false;
+      ambassador.endDate = new Date();
+      const updateAmbassadorDetails = ambassador.save({transaction:t})
+      const updateUser = User.update({ isAmbassador: false }, {where : {id : ambassador.id},transaction:t});
+      return await Promise.all([updateAmbassadorDetails , updateUser]);
+    });
+
     res.json({ code: 1, data: { message: "ambassador account deactivated" } });
   } catch (err) {
     console.log(err);
