@@ -13,6 +13,7 @@ const {
   paymentModes,
 } = require("../../utils/enums");
 const { OrderTotal, validateStatus } = require("../../utils/orderUtils");
+const getPaymentLink = require("../../utils/Payments/getPaymentLink");
 
 const router = require("express").Router();
 
@@ -121,7 +122,7 @@ router.route("/:id/modifyOrderStatus").post(async (req, res) => {
   try {
     const order = await Order.findByPk(orderId);
     if (order) {
-      if (validateStatus(order.orderStatus, status)) {
+      if (validateStatus(order, status)) {
         order.orderStatus = status;
         if (status == orderStatus.SHIPPED) {
           order.minDeliveryDate = new Date(req.body.minDate);
@@ -142,6 +143,34 @@ router.route("/:id/modifyOrderStatus").post(async (req, res) => {
     }
   } catch (err) {
     res.json({ code: 0, message: " something went wrong" });
+  }
+});
+router.route("/:id/resendPaymentLink").post(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findByPk(id);
+    if (order) {
+      if (
+        order.paymentMode == paymentModes.CASHFREE &&
+        order.paymentStatus == paymentStatus.PENDING
+      ) {
+        try {
+          const link = await getPaymentLink(order.gatewayOrderId, {
+            existing: true,
+          });
+          res.json({ code: 1, data: { paymentLink: link } });
+        } catch (err) {
+          console.log(err);
+          res.json({ code: 0, message: err });
+        }
+      } else {
+        res.json({ code: 0, message: "order not eligible for resending link" });
+      }
+    } else {
+      res.json({ code: 0, message: "invalid orderId" });
+    }
+  } catch (err) {
+    res.json({ code: 0, message: "something went wrong" });
   }
 });
 
