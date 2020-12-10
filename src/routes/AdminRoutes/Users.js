@@ -22,7 +22,7 @@ router.get("/", async (req, res) => {
 router.get("/:id/cart", async (req, res) => {
   try {
     const userCart = await Cart.findAll({
-      userId: req.params.id,
+      where: { userId: req.params.id },
       attributes: ["plan", "id", "qty"],
       order: [["createdAt", "DESC"]],
       include: {
@@ -47,6 +47,7 @@ router.get("/:id/cart", async (req, res) => {
 router.get("/cartStats", async (req, res) => {
   try {
     const userCarts = await User.findAll({
+      group: ["id"],
       attributes: [
         "id",
         "name",
