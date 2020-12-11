@@ -40,6 +40,7 @@ const returnStates = {
 };
 
 const approvalStates = { PENDING: 0, NOT_APPROVED: -1, APPROVED: 1 };
+const sellerTypes = { MARTOLEX: true, OTHERS: false };
 
 module.exports = {
   plans,
@@ -48,5 +49,6 @@ module.exports = {
   planDuration,
   orderStatus,
   returnStates,
+  sellerTypes,
   approvalStates,
 };

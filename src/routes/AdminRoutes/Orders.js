@@ -13,62 +13,63 @@ const {
   paymentStatus,
   paymentModes,
 } = require("../../utils/enums");
-const { OrderTotal, validateStatus } = require("../../utils/orderUtils");
+const {
+  OrderTotal,
+  validateStatus,
+  createOrderFilters,
+  ValidateFilters,
+} = require("../../utils/orderUtils");
 const getPaymentLink = require("../../utils/Payments/getPaymentLink");
 
 const router = require("express").Router();
 
 router.route("/").get(async (req, res) => {
-  const searchParams = {};
-  if (req.query.status) {
-    if (
-      !Object.values(orderStatus).includes(
-        String(req.query.status).toUpperCase()
-      )
-    ) {
-      res.json({ code: 0, data: { message: "order status is invalid" } });
-    } else {
-      searchParams.orderStatus = req.query.status;
-    }
-  }
-  let orders = await Order.findAll({
-    where: searchParams,
-    attributes: [
-      "id",
-      "paymentMode",
-      "paymentStatus",
-      "deliveryAmount",
-      "createdAt",
-    ],
-    order: [["createdAt", "DESC"]],
-    include: [
-      {
-        model: User,
-        as: "user",
-        attributes: ["name"],
-      },
-      { model: UserAddress, as: "address", attributes: ["city"] },
-      {
-        model: OrderItem,
-        as: "items",
-        include: {
-          model: Book,
-          attributes: ["id"],
-          as: "book",
+  try {
+    ValidateFilters(req.query);
+    const filters = createOrderFilters(req.query);
+    let orders = await Order.findAll({
+      where: filters,
+      attributes: [
+        "id",
+        "paymentMode",
+        "paymentStatus",
+        "deliveryAmount",
+        "createdAt",
+      ],
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          as: "user",
+          required: true,
+          attributes: ["name", "isAdmin"],
         },
-      },
-    ],
-  });
+        { model: UserAddress, as: "address", attributes: ["city"] },
+        {
+          model: OrderItem,
+          as: "items",
+          include: {
+            model: Book,
+            attributes: ["id"],
+            as: "book",
+          },
+        },
+      ],
+    });
 
-  orders = orders.map((order) => {
-    const { items, ...orderDetails } = order.toJSON();
-    return {
-      ...orderDetails,
-      totalAmount: OrderTotal(items) + orderDetails.deliveryAmount,
-    };
-  });
+    orders = orders.map((order) => {
+      const { items, ...orderDetails } = order.toJSON();
+      return {
+        ...orderDetails,
+        totalAmount: OrderTotal(items) + orderDetails.deliveryAmount,
+      };
+    });
 
-  res.json({ code: 1, data: orders });
+    res.json({ code: 1, data: orders });
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: err.message });
+  }
 });
 
 router.route("/:id").get(async (req, res) => {
