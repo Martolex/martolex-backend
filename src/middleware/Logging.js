@@ -1,4 +1,5 @@
 const fs = require("fs");
+const config = require("../config/config");
 
 const getActualRequestDurationInMilliseconds = (start) => {
   const NS_PER_SEC = 1e9; //  convert to nanoseconds
@@ -31,7 +32,7 @@ const Logger = (req, res, next) => {
   }] ${method}:${url} ${status} ${durationInMilliseconds.toLocaleString()} ms`;
 
   console.log(log);
-  fs.appendFile("request_logs.txt", log + "\n", (err) => {
+  fs.appendFile(config.config.requestLogsFile, log + "\n", (err) => {
     if (err) {
       console.log(err);
     }
