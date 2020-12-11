@@ -13,7 +13,7 @@ module.exports.createCartItem = (item) => {
     plan: item.plan,
     rent: itemRent,
     returnAmount: itemPrice - itemRent,
-    bookId: item.bookId,
+    bookId: item.BookId,
     book: {
       name: item.book.name,
       images: item.book.images,
