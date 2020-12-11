@@ -1,4 +1,5 @@
 // require("dotenv").config({ path: "./.env.prod" });
+// require("dotenv").config({ path: "./.env.test" });
 const Express = require("express");
 const App = Express();
 var session = require("express-session");
@@ -7,8 +8,10 @@ const IndexRouter = require("./routes/index");
 const db = require("./config/db");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-
+const models = require("./models/index");
+const RequestLogger = require("./middleware/Logging");
 const AWS = require("aws-sdk");
+const { scheduleCrons } = require("./crons");
 AWS.config.update({
   signatureVersion: "v4",
   region: "ap-south-1",
@@ -24,15 +27,8 @@ App.use(
   })
 );
 
-const models = require("./models/index");
+scheduleCrons();
 
-// models.Colleges.bulkCreate([
-//   { name: "KJ SOMAIYA", city: "MUMBAI" },
-//   { name: "COEP", city: "PUNE" },
-// ]).then(() => {
-//   console.log("created");
-// });
-//
 if (env == "dev") {
   // db.sync({ alter: true });
   //   .then(() => {
@@ -42,7 +38,7 @@ if (env == "dev") {
   // sessionStore.sync();
 }
 
-App.use(IndexRouter);
+App.use(RequestLogger, IndexRouter);
 App.listen(process.env.port || config.port, () => {
   console.log("martolex server running");
 });
