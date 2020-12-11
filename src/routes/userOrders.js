@@ -37,7 +37,6 @@ const getGroupedItems = async (items) => {
       })
     );
     const books = await Promise.all(promises);
-    console.log(books.map((book) => book.upload.id));
 
     const grouped = books.reduce(
       (grouped, book, idx) =>
@@ -72,7 +71,6 @@ router.route("/create").post(async (req, res) => {
         addressPromise = UserAddress.findByPk(req.body.addressId, {
           transaction: t,
         });
-        // console.log(address);
       } else {
         addressPromise = UserAddress.create(
           {
@@ -349,7 +347,6 @@ router.route("/return/:itemId/cancelRequest").post(async (req, res) => {
     });
     if (item) {
       if (item.order.user.id === req.user.id) {
-        console.log(typeof item.returnDate);
         const returnDate = new Date(item.returnDate);
         item.isReturned = returnStates.NOT_RETURNED;
         await item.save();

@@ -15,4 +15,8 @@ const CASHFREE_API =
 
 module.exports.endpoints = {
   createOrder: { url: `${CASHFREE_API}/api/v1/order/create`, method: "POST" },
+  getExistingOrderLink: {
+    url: `${CASHFREE_API}/api/v1/order/info/link`,
+    method: "POST",
+  },
 };

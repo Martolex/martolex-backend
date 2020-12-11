@@ -1,3 +1,5 @@
+const { stat } = require("fs");
+const moment = require("moment");
 const {
   Order,
   User,
@@ -6,62 +8,68 @@ const {
   Book,
   UserAddress,
 } = require("../../models");
-const { orderStatus } = require("../../utils/enums");
-const { OrderTotal } = require("../../utils/orderUtils");
+const {
+  orderStatus,
+  paymentStatus,
+  paymentModes,
+} = require("../../utils/enums");
+const {
+  OrderTotal,
+  validateStatus,
+  createOrderFilters,
+  ValidateFilters,
+} = require("../../utils/orderUtils");
+const getPaymentLink = require("../../utils/Payments/getPaymentLink");
 
 const router = require("express").Router();
 
 router.route("/").get(async (req, res) => {
-  const searchParams = {};
-  if (req.query.status) {
-    if (
-      !Object.values(orderStatus).includes(
-        String(req.query.status).toUpperCase()
-      )
-    ) {
-      res.json({ code: 0, data: { message: "order status is invalid" } });
-    } else {
-      searchParams.orderStatus = req.query.status;
-    }
-  }
-  let orders = await Order.findAll({
-    where: searchParams,
-    attributes: [
-      "id",
-      "paymentMode",
-      "paymentStatus",
-      "deliveryAmount",
-      "createdAt",
-    ],
-    order: [["createdAt", "DESC"]],
-    include: [
-      {
-        model: User,
-        as: "user",
-        attributes: ["name"],
-      },
-      { model: UserAddress, as: "address", attributes: ["city"] },
-      {
-        model: OrderItem,
-        as: "items",
-        include: {
-          model: Book,
-          attributes: ["id"],
-          as: "book",
+  try {
+    ValidateFilters(req.query);
+    const filters = createOrderFilters(req.query);
+    let orders = await Order.findAll({
+      where: filters,
+      attributes: [
+        "id",
+        "paymentMode",
+        "paymentStatus",
+        "deliveryAmount",
+        "createdAt",
+      ],
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          as: "user",
+          required: true,
+          attributes: ["name", "isAdmin"],
         },
-      },
-    ],
-  });
+        { model: UserAddress, as: "address", attributes: ["city"] },
+        {
+          model: OrderItem,
+          as: "items",
+          include: {
+            model: Book,
+            attributes: ["id"],
+            as: "book",
+          },
+        },
+      ],
+    });
 
-  orders = orders.map((order) => {
-    const { items, ...orderDetails } = order.toJSON();
-    return {
-      ...orderDetails,
-      totalAmount: OrderTotal(items) + orderDetails.deliveryAmount,
-    };
-  });
+    orders = orders.map((order) => {
+      const { items, ...orderDetails } = order.toJSON();
+      return {
+        ...orderDetails,
+        totalAmount: OrderTotal(items) + orderDetails.deliveryAmount,
+      };
+    });
 
-  res.json({ code: 1, data: orders });
+    res.json({ code: 1, data: orders });
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: err.message });
+  }
 });
 
 router.route("/:id").get(async (req, res) => {
@@ -70,6 +78,7 @@ router.route("/:id").get(async (req, res) => {
       attributes: [
         "id",
         "paymentMode",
+        "paymentStatus",
         "orderStatus",
         "deliveryAmount",
         "createdAt",
@@ -107,6 +116,94 @@ router.route("/:id").get(async (req, res) => {
 
   order.totalAmount = OrderTotal(order.items) + order.deliveryAmount;
   res.json({ code: 1, data: order });
+});
+
+router.route("/:id/modifyOrderStatus").post(async (req, res) => {
+  const orderId = req.params.id;
+  const { status } = req.body;
+  try {
+    const order = await Order.findByPk(orderId);
+    if (order) {
+      if (validateStatus(order, status)) {
+        order.orderStatus = status;
+        if (status == orderStatus.SHIPPED) {
+          order.minDeliveryDate = new Date(req.body.minDate);
+          order.maxDeliveryDate = new Date(req.body.maxDate);
+        } else if (status == orderStatus.DELIVERED) {
+          order.actualDeliveryDate = req.body.deliveryDate || new Date();
+          if (order.paymentMode === paymentModes.COD) {
+            order.paymentStatus = paymentStatus.PAID;
+          }
+        }
+        await order.save();
+        res.json({ code: 1, data: { success: true } });
+      } else {
+        res.json({ code: 0, message: "status transition invalid" });
+      }
+    } else {
+      res.json({ code: 0, message: "order ID invalid" });
+    }
+  } catch (err) {
+    res.json({ code: 0, message: " something went wrong" });
+  }
+});
+
+router.route("/:id/modifyDeliveryDates").post(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findByPk(id);
+    if (order) {
+      if (
+        moment(req.body.deliveryMaxDate).diff(
+          moment(req.body.deliveryMinDate),
+          "days"
+        ) > 0
+      ) {
+        order.deliveryMinDate = req.body.deliveryMinDate;
+        order.deliveryMaxDate = req.body.deliveryMaxDate;
+
+        await order.save();
+        res.json({ code: 1, data: { success: true } });
+      } else {
+        res.json({
+          code: 0,
+          message: "min Delivery date cannot be greater than max",
+        });
+      }
+    } else {
+      res.json({ code: 0, message: "invalid orderId" });
+    }
+  } catch (err) {
+    res.json({ code: 0, message: "something went wrong" });
+  }
+});
+router.route("/:id/resendPaymentLink").post(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await Order.findByPk(id);
+    if (order) {
+      if (
+        order.paymentMode == paymentModes.CASHFREE &&
+        order.paymentStatus == paymentStatus.PENDING
+      ) {
+        try {
+          const link = await getPaymentLink(order.gatewayOrderId, {
+            existing: true,
+          });
+          res.json({ code: 1, data: { paymentLink: link } });
+        } catch (err) {
+          console.log(err);
+          res.json({ code: 0, message: err });
+        }
+      } else {
+        res.json({ code: 0, message: "order not eligible for resending link" });
+      }
+    } else {
+      res.json({ code: 0, message: "invalid orderId" });
+    }
+  } catch (err) {
+    res.json({ code: 0, message: "something went wrong" });
+  }
 });
 
 module.exports = router;

@@ -80,8 +80,7 @@ router.route("/cat/:catId").get(async (req, res) => {
   try {
     const limit = Number(req.query.limit) || config.defaultLimit;
     const offset = Number(req.query.offset) || 0;
-    console.log(limit);
-    console.log(offset);
+
     const catId = escape(req.params.catId);
     const books = await Book.scope("available").findAll({
       limit,
@@ -131,12 +130,10 @@ router.route("/cat/:catId").get(async (req, res) => {
 });
 
 router.route("/cat/:catId/subCat/:subCatId").get(async (req, res) => {
-  console.log(req.query);
   try {
     const limit = Number(req.query.limit) || config.defaultLimit;
     const offset = Number(req.query.offset) || 0;
-    console.log(limit);
-    console.log(offset);
+
     const books = await Book.scope("available").findAll({
       limit,
       offset,
