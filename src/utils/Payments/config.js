@@ -9,7 +9,9 @@ module.exports.SECRET_KEY =
 const CASHFREE_PROD_API = "https://api.cashfree.com";
 const CASHFREE_TEST_API = "https://test.cashfree.com";
 const CASHFREE_API =
-  config.env == "dev" ? CASHFREE_TEST_API : CASHFREE_PROD_API;
+  config.env == "dev" || config.env == "test"
+    ? CASHFREE_TEST_API
+    : CASHFREE_PROD_API;
 
 module.exports.endpoints = {
   createOrder: { url: `${CASHFREE_API}/api/v1/order/create`, method: "POST" },
