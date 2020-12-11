@@ -7,6 +7,8 @@ const IndexRouter = require("./routes/index");
 const db = require("./config/db");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const models = require("./models/index");
+const RequestLogger = require("./middleware/Logging");
 
 const AWS = require("aws-sdk");
 AWS.config.update({
@@ -24,8 +26,6 @@ App.use(
   })
 );
 
-const models = require("./models/index");
-
 // models.Colleges.bulkCreate([
 //   { name: "KJ SOMAIYA", city: "MUMBAI" },
 //   { name: "COEP", city: "PUNE" },
@@ -42,7 +42,7 @@ if (env == "dev") {
   // sessionStore.sync();
 }
 
-App.use(IndexRouter);
+App.use(RequestLogger, IndexRouter);
 App.listen(process.env.port || config.port, () => {
   console.log("martolex server running");
 });
