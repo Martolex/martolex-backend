@@ -301,7 +301,7 @@ router
       rent.sellPrice = sellPrice;
       rent.mrp = mrp;
       rent.deposit = deposit;
-      console.log(await rent.save());
+      await rent.save();
       res.json({
         code: 1,
         data: { message: "book modified successfully" },
@@ -333,7 +333,6 @@ router
 
 router.route("/:bookId").get(async (req, res) => {
   try {
-    console.log("here");
     const book = await Book.findByPk(req.params.bookId, {
       attributes: [
         ...Object.keys(Book.rawAttributes),
@@ -365,7 +364,6 @@ router.route("/:bookId").get(async (req, res) => {
         },
       ],
     });
-    console.log(book);
     res.json({
       code: 1,
       data: book,

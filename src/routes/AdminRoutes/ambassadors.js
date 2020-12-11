@@ -7,7 +7,6 @@ const router = require("express").Router();
 router.use(
   "/:id",
   (req, res, next) => {
-    console.log(req.params);
     req.user.ambassadorId = req.params.id;
     next();
   },
@@ -38,7 +37,6 @@ router.route("/").get(async (req, res) => {
 });
 
 router.route("/new").post(async (req, res) => {
-  console.log(req.body);
   if (!req.body.collegeId || !req.body.userId || req.body.isActive) {
     res.status(400).json({ code: 0, message: "bad request" });
   } else {

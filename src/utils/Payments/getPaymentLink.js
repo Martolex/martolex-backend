@@ -38,7 +38,6 @@ const getPaymentLink = async (
     : config.endpoints.getExistingOrderLink;
 
   const response = await requests[API.method](API.url, data);
-  console.log(response);
   if (response.status == "OK") {
     return response.paymentLink;
   } else {
