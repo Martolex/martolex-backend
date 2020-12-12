@@ -38,7 +38,7 @@ if (env == "dev") {
   // sessionStore.sync();
 }
 
-App.use(RequestLogger, IndexRouter);
+App.use(IndexRouter);
 App.listen(process.env.port || config.port, () => {
   console.log("martolex server running");
 });

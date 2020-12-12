@@ -12,6 +12,8 @@ const verifyRole = require("../middleware/verifyRole");
 const paymentsRouter = require("./Payments");
 const isAmbassador = require("../middleware/isAmbassador");
 const { userRoutes: noFoundBooksUserRouter } = require("./BooksNotFound");
+const RequestLogger = require("../middleware/Logging");
+
 router
   .route("/")
   .get((req, res) => {
@@ -21,17 +23,21 @@ router
     res.send("martolex POST api");
   });
 
-router.use("/auth", authRouter);
-router.use("/admin", verifyRole, adminRouter);
-router.use("/user", isLoggedIn, userRouter);
-router.use("/categories", categoriesRouter);
-router.use("/books", booksRouter);
-router.use("/newsletter", newsLetterRouter);
-router.use("/not-found-books", noFoundBooksUserRouter);
+router.use("/auth", RequestLogger, authRouter);
+router.use("/admin", RequestLogger, verifyRole, adminRouter);
+router.use("/user", RequestLogger, isLoggedIn, userRouter);
+router.use("/categories", RequestLogger, categoriesRouter);
+router.use("/books", RequestLogger, booksRouter);
+router.use("/newsletter", RequestLogger, newsLetterRouter);
+router.use("/not-found-books", RequestLogger, noFoundBooksUserRouter);
 
-router.use("/payments", paymentsRouter);
+router.use("/payments", RequestLogger, paymentsRouter);
 
-router.use("/seller", isSeller, sellerRouter);
-router.use("/ambassador", isAmbassador, require("./studentAmbassador"));
-
+router.use("/seller", RequestLogger, isSeller, sellerRouter);
+router.use(
+  "/ambassador",
+  RequestLogger,
+  isAmbassador,
+  require("./studentAmbassador")
+);
 module.exports = router;
