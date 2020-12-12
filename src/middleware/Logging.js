@@ -1,5 +1,6 @@
 const fs = require("fs");
-const config = require("../config/config");
+const { env } = require("../config/config");
+const { config } = require("../config/config");
 
 const getActualRequestDurationInMilliseconds = (start) => {
   const NS_PER_SEC = 1e9; //  convert to nanoseconds
@@ -27,16 +28,22 @@ const Logger = (req, res, next) => {
   let status = res.statusCode;
   const start = process.hrtime();
   const durationInMilliseconds = getActualRequestDurationInMilliseconds(start);
-  let log = `[${formatted_date}] [${
-    req.ip
-  }] ${method}:${url} ${status} ${durationInMilliseconds.toLocaleString()} ms`;
-
-  console.log(log);
-  fs.appendFile(config.config.requestLogsFile, log + "\n", (err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
+  let log = "";
+  if (env === "dev") {
+    log = `[${formatted_date}] [${
+      req.ip
+    }] ${method}:${url} ${status} ${durationInMilliseconds.toLocaleString()} ms`;
+    console.log(log);
+  } else {
+    log = `${formatted_date}, ${
+      req.ip
+    }, ${method}, ${url}, ${status}, ${durationInMilliseconds.toLocaleString()}ms`;
+    fs.appendFile(config.requestLogsFile, log + "\n", (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
   next();
 };
 
