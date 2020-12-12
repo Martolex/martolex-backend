@@ -23,7 +23,7 @@ const Logger = (req, res, next) => {
     ":" +
     current_datetime.getSeconds();
   let method = req.method;
-  let url = req.url;
+  let url = req.originalUrl;
   let status = res.statusCode;
   const start = process.hrtime();
   const durationInMilliseconds = getActualRequestDurationInMilliseconds(start);
