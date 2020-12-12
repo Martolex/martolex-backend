@@ -272,7 +272,11 @@ router.post("/ambassadorSignIn", async (req, res, next) => {
           data: {
             auth: true,
             token: token,
-            profile: { ...userProfile, college: ambassador.college },
+            profile: {
+              ...userProfile,
+              college: ambassador.college,
+              referralCode: ambassador.referralCode,
+            },
             message: "user authenticated and authorized",
           },
         });
