@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { env } = require("../config/config");
 const config = require("../config/config");
 
 const getActualRequestDurationInMilliseconds = (start) => {
@@ -30,13 +31,15 @@ const Logger = (req, res, next) => {
   let log = `[${formatted_date}] [${
     req.ip
   }] ${method}:${url} ${status} ${durationInMilliseconds.toLocaleString()} ms`;
-
-  console.log(log);
-  fs.appendFile(config.config.requestLogsFile, log + "\n", (err) => {
-    if (err) {
-      console.log(err);
-    }
-  });
+  if (env === "dev") {
+    console.log(log);
+  } else {
+    fs.appendFile(config.config.requestLogsFile, log + "\n", (err) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
   next();
 };
 
