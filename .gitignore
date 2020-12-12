@@ -1,4 +1,4 @@
 node_modules
 .env*
 
-request_logs.txt
+request_logs.*

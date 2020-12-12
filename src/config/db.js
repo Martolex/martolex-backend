@@ -19,7 +19,7 @@ var sequelize = new Sequelize(
     dialect: "mysql",
 
     dialectOptions:
-      env !== "dev"
+      env === "test" || env === "production"
         ? {
             ssl: "Amazon RDS",
           }

@@ -19,7 +19,7 @@ const config = {
   deliveryCharge: { forward: 30, return: 0 },
   applications: { USER_APP, ADMIN_APP, AMBASSADOR_APP },
   resetPasswordTokenExpiry: 30 * 60,
-  requestLogsFile: "request_logs.txt",
+  requestLogsFile: "request_logs.csv",
   reqLogsBucket: "martolex-request-logs" || process.env.REQUEST_LOGS_BUCKET,
 };
 module.exports = { config: config, env };
