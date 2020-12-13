@@ -5,6 +5,7 @@ const AWS = require("aws-sdk");
 const fs = require("fs");
 const s3 = new AWS.S3();
 const backupLogs = () => {
+  console.log("starting backup");
   const s3FileKey = `${UUID()}-${env}-${moment().format(
     "DD-MM-YYYY:HH:mm:ss"
   )}.txt`;
@@ -13,6 +14,7 @@ const backupLogs = () => {
 
   fs.readFile(fileName, (err, data) => {
     if (err) {
+      console.log(err);
     } else {
       const params = {
         Bucket: config.reqLogsBucket,
