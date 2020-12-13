@@ -12,7 +12,7 @@ const getActualRequestDurationInMilliseconds = (start) => {
 console.log(env);
 try {
   if (!fs.existsSync(config.requestLogsFile)) {
-    fs.writeFile(config.requestLogsFile, "", function (err) {
+    fs.appendFile(config.requestLogsFile, "", function (err) {
       if (err) throw err;
     });
   }
