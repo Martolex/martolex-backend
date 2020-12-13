@@ -9,6 +9,17 @@ const getActualRequestDurationInMilliseconds = (start) => {
   return (diff[0] * NS_PER_SEC + diff[1]) / NS_TO_MS;
 };
 
+console.log(env);
+try {
+  if (!fs.existsSync(config.requestLogsFile)) {
+    fs.writeFile(config.requestLogsFile, "", function (err) {
+      if (err) throw err;
+    });
+  }
+} catch (err) {
+  console.log(err);
+}
+
 const Logger = (req, res, next) => {
   let current_datetime = new Date();
   let formatted_date =
