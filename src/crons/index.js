@@ -5,7 +5,6 @@ const backupLogs = require("./backupLogs");
 const scheduleCrons = () => {
   console.log("---scheduling crons---");
   if (env === "test" || env == "production") {
-    backupLogs();
     schedule("0 0 * * *", backupLogs);
     console.log("request log backup cron scheduled");
   }
