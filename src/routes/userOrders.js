@@ -382,4 +382,33 @@ router.route("/return/:itemId/cancelRequest").post(async (req, res) => {
     res.json({ code: 0, message: "something went wrong" });
   }
 });
+
+router.route("/retryPayment").post(async (req, res) => {
+  const { orderId } = req.body;
+  console.log(orderId);
+  try {
+    const order = await Order.findOne({
+      where: {
+        id: orderId,
+        userId: req.user.id,
+      },
+    });
+    if (order) {
+      if (order.paymentStatus !== paymentStatus.PAID) {
+        const paymentLink = await getPaymentLink(order.gatewayOrderId, {
+          existing: true,
+        });
+        res.json({ code: 1, data: { paymentLink } });
+      } else {
+        res.json({ code: 0, message: "Payment already done" });
+      }
+    } else {
+      res.json({ code: 0, message: "invalid orderId" });
+    }
+  } catch (err) {
+    console.log(err);
+    res.json({ code: 0, message: "something went wrong. Try again later" });
+  }
+});
+
 module.exports = router;
