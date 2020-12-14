@@ -20,6 +20,7 @@ const {
   ValidateFilters,
 } = require("../../utils/orderUtils");
 const getPaymentLink = require("../../utils/Payments/getPaymentLink");
+const AWS = require;
 
 const router = require("express").Router();
 
@@ -191,6 +192,23 @@ router.route("/:id/resendPaymentLink").post(async (req, res) => {
             existing: true,
           });
           res.json({ code: 1, data: { paymentLink: link } });
+          const emailLambdaPayload = {
+            type: "RESEND_PAYMENT_LINK",
+            orderId: order.id,
+            paymentLink: link,
+          };
+          const params = {
+            FunctionName: "email-service",
+            InvocationType: "RequestResponse",
+            Payload: emailLambdaPayload,
+          };
+          Lambda.invoke(params, (err, data) => {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log(data);
+            }
+          });
         } catch (err) {
           console.log(err);
           res.json({ code: 0, message: err });
