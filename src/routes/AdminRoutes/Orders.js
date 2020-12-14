@@ -20,7 +20,8 @@ const {
   ValidateFilters,
 } = require("../../utils/orderUtils");
 const getPaymentLink = require("../../utils/Payments/getPaymentLink");
-const AWS = require;
+const AWS = require("aws-sdk");
+const Lambda = new AWS.Lambda();
 
 const router = require("express").Router();
 
@@ -200,7 +201,7 @@ router.route("/:id/resendPaymentLink").post(async (req, res) => {
           const params = {
             FunctionName: "email-service",
             InvocationType: "RequestResponse",
-            Payload: emailLambdaPayload,
+            Payload: JSON.stringify(emailLambdaPayload),
           };
           Lambda.invoke(params, (err, data) => {
             if (err) {
