@@ -167,33 +167,30 @@ router.post("/signIn", async (req, res, next) => {
   }).then((user) => {
     if (!user) {
       res.status(401).json({ code: 0, auth: false, message: "user not found" });
-    }
-    if (!bCrypt.compareSync(req.body.password, user.password)) {
+    } else if (!bCrypt.compareSync(req.body.password, user.password)) {
       res
         .status(401)
         .json({ code: 0, auth: false, message: "incorrect password" });
+    } else {
+      const token = jwt.sign(
+        {
+          id: user.id,
+          type: "user",
+          isAdmin: user.isAdmin,
+          isSeller: user.isSeller,
+        },
+        config.jwtSecret
+      );
+      res.status(200).send({
+        code: 1,
+        data: {
+          auth: true,
+          token: token,
+          profile: user,
+          message: "user found & logged in",
+        },
+      });
     }
-    if (!user) {
-      res.status(401).json({ code: 0, auth: false, message: "user not found" });
-    }
-    const token = jwt.sign(
-      {
-        id: user.id,
-        type: "user",
-        isAdmin: user.isAdmin,
-        isSeller: user.isSeller,
-      },
-      config.jwtSecret
-    );
-    res.status(200).send({
-      code: 1,
-      data: {
-        auth: true,
-        token: token,
-        profile: user,
-        message: "user found & logged in",
-      },
-    });
   });
 });
 router.post("/adminSignIn", async (req, res, next) => {
