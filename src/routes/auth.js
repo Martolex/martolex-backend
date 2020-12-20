@@ -11,6 +11,8 @@ const genPasswordResetLink = require("../utils/genPasswordResetLink");
 const {
   InvalidTokenError,
   UserExistsError,
+  PasswordMismatchError,
+  UnauthorizedError,
 } = require("../Exceptions/UserExceptions");
 const UserService = require("../services/UserService");
 const { LoginTypes } = require("../utils/enums");
@@ -152,126 +154,130 @@ router.post("/signUp", async (req, res) => {
 });
 
 router.post("/signIn", async (req, res, next) => {
-  User.findOne({
-    where: {
-      email: req.body.email,
-    },
-  }).then((user) => {
-    if (!user) {
-      res.status(401).json({ code: 0, auth: false, message: "user not found" });
-    } else if (!bCrypt.compareSync(req.body.password, user.password)) {
-      res
-        .status(401)
-        .json({ code: 0, auth: false, message: "incorrect password" });
-    } else {
-      const token = jwt.sign(
-        {
-          id: user.id,
-          type: "user",
-          isAdmin: user.isAdmin,
-          isSeller: user.isSeller,
-        },
-        config.jwtSecret
-      );
-      res.status(200).send({
-        code: 1,
-        data: {
-          auth: true,
-          token: token,
-          profile: user,
-          message: "user found & logged in",
-        },
-      });
-    }
-  });
-});
-router.post("/googleSignIn", async (req, res) => {});
-router.post("/adminSignIn", async (req, res, next) => {
-  User.findOne({
-    where: {
-      email: req.body.email,
-    },
-  }).then((user) => {
-    if (!user || !user.isAdmin) {
-      res.status(401).json({ code: 0, auth: false, message: "user not found" });
-    }
-
-    if (!bCrypt.compareSync(req.body.password, user.password)) {
-      res
-        .status(401)
-        .json({ code: 0, auth: false, message: "incorrect password" });
-    }
-    if (!user) {
-      res.status(401).json({ code: 0, auth: false, message: "user not found" });
-    }
-    const token = jwt.sign(
-      { id: user.id, isAdmin: user.isAdmin },
-      config.jwtSecret
+  try {
+    const { token, profile } = await UserService.signInByEmail(
+      req.body.email,
+      req.body.password
     );
     res.status(200).send({
       code: 1,
       data: {
         auth: true,
-        token: token,
-        profile: user,
+        token,
+        profile,
         message: "user found & logged in",
       },
     });
-  });
+  } catch (err) {
+    console.log(err);
+    if (
+      err instanceof PasswordMismatchError ||
+      err instanceof UserExistsError ||
+      err instanceof UnauthorizedError
+    )
+      res.status(401).json({ code: 0, message: err.message });
+    else
+      res.json({ code: 0, message: "something went wrong. Try again later" });
+  }
+});
+router.post("/googleSignIn", async (req, res) => {
+  const { tokenId } = req.body;
+  try {
+    const { token, profile } = await UserService.signInByGoogle(tokenId);
+    res.status(200).send({
+      code: 1,
+      data: {
+        auth: true,
+        token,
+        type: LoginTypes.GOOGLE,
+        profile,
+        message: "user found & logged in",
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    if (
+      err instanceof PasswordMismatchError ||
+      err instanceof UserExistsError ||
+      err instanceof UnauthorizedError
+    )
+      res.status(401).json({ code: 0, message: err.message });
+    else if (err.message.includes("parse")) {
+      res.status(400).json({
+        code: 0,
+        message: "invalid request. tokenId is not issued by this server",
+      });
+    } else
+      res.json({ code: 0, message: "something went wrong. Try again later" });
+  }
+});
+router.post("/adminSignIn", async (req, res, next) => {
+  try {
+    const { token, profile } = await UserService.signInByEmail(
+      req.body.email,
+      req.body.password,
+      { scope: { isAdmin: true } }
+    );
+    res.status(200).send({
+      code: 1,
+      data: {
+        auth: true,
+        token,
+        profile,
+        message: "user found & logged in",
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    if (
+      err instanceof PasswordMismatchError ||
+      err instanceof UserExistsError ||
+      err instanceof UnauthorizedError
+    )
+      res.status(401).json({ code: 0, message: err.message });
+    else
+      res.json({ code: 0, message: "something went wrong. Try again later" });
+  }
 });
 
 router.post("/ambassadorSignIn", async (req, res, next) => {
-  AmbassadorDetails.findOne({
-    where: { isActive: true },
-    include: [
+  try {
+    const { token, profile } = await UserService.signInByEmail(
+      req.body.email,
+      req.body.password,
       {
-        model: User,
-        as: "user",
-        where: {
-          email: req.body.email,
-        },
-        attributes: ["id", "name", "email", "phoneNo", "password"],
-        required: true,
-      },
-      { model: Colleges, as: "college", attributes: ["name", "id"] },
-    ],
-  })
-    .then((ambassador) => {
-      if (!ambassador || !ambassador.isActive) {
-        res
-          .status(401)
-          .json({ code: 0, auth: false, message: "user not found" });
-      } else if (
-        !bCrypt.compareSync(req.body.password, ambassador.user.password)
-      ) {
-        res
-          .status(401)
-          .json({ code: 0, auth: false, message: "incorrect password" });
-      } else {
-        const token = jwt.sign(
-          {
-            id: ambassador.user.id,
-            isAmbassador: true,
-            ambassadorId: ambassador.id,
-          },
-          config.jwtSecret
-        );
-        const { password, ...userProfile } = ambassador.toJSON().user;
-        res.status(200).send({
-          code: 1,
-          data: {
-            auth: true,
-            token: token,
-            profile: {
-              ...userProfile,
-              college: ambassador.college,
-              referralCode: ambassador.referralCode,
-            },
-            message: "user authenticated and authorized",
-          },
-        });
+        scope: { isAmbassador: true },
+        attributes: ["id", "name", "email", "phoneNo"],
       }
-    })
-    .catch((err) => console.log(err));
+    );
+    const { college } = (
+      await AmbassadorDetails.findOne({
+        where: { isActive: true },
+        include: [
+          { model: Colleges, as: "college", attributes: ["name", "id"] },
+        ],
+      })
+    ).toJSON();
+    console.log();
+    res.status(200).send({
+      code: 1,
+      data: {
+        auth: true,
+        token,
+        profile: { ...profile, college },
+        message: "user found & logged in",
+      },
+    });
+  } catch (err) {
+    console.log(err);
+    if (
+      err instanceof PasswordMismatchError ||
+      err instanceof UserExistsError ||
+      err instanceof UnauthorizedError
+    )
+      res.status(401).json({ code: 0, message: err.message });
+    else
+      res.json({ code: 0, message: "something went wrong. Try again later" });
+  }
 });
 module.exports = router;

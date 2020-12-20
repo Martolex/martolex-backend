@@ -20,6 +20,9 @@ const config = {
   applications: { USER_APP, ADMIN_APP, AMBASSADOR_APP },
   resetPasswordTokenExpiry: 30 * 60,
   requestLogsFile: "request_logs.csv",
+  OAuth2Client:
+    process.env.GOOGLE_AUTH_CLIENT_ID ||
+    "805701513060-k7q12mme5jgbmhfr740co92vhrc29nme.apps.googleusercontent.com",
   reqLogsBucket: "martolex-request-logs" || process.env.REQUEST_LOGS_BUCKET,
 };
 module.exports = { config: config, env };
