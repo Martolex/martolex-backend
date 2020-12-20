@@ -16,10 +16,9 @@ User.init(
       unique: true,
       validate: { isEmail: true },
     },
-    password: { type: DataTypes.TEXT, allowNull: false },
+    password: { type: DataTypes.TEXT, allowNull: true },
     phoneNo: {
       type: DataTypes.STRING(10),
-      allowNull: false,
       validate: { isValidPhone: isValidPhone },
     },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },

@@ -1,6 +1,7 @@
 module.exports.isValidPhone = (phone) => {
   var phonenoRegex = /^\d{10}$/;
-  if (!phone.match(phonenoRegex)) {
+  console.log(!phone.match(phonenoRegex));
+  if (phone != "GOOGLE" && !phone.match(phonenoRegex)) {
     throw new Error("enter valid phoneNo");
   }
 };

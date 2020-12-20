@@ -8,7 +8,12 @@ const router = require("express").Router();
 const bCrypt = require("bcryptjs");
 const AmbassadorDetails = require("../models/AmbassadorDetails");
 const genPasswordResetLink = require("../utils/genPasswordResetLink");
-const { InvalidTokenError } = require("../Exceptions");
+const {
+  InvalidTokenError,
+  UserExistsError,
+} = require("../Exceptions/UserExceptions");
+const UserService = require("../services/UserService");
+const { LoginTypes } = require("../utils/enums");
 const sequelize = require("../config/db");
 
 AWS.config.update({ region: "ap-south-1" });
@@ -126,37 +131,24 @@ router.post("/forgot-password/reset-password", async (req, res) => {
     }
   }
 });
-router.post("/signUp", (req, res) => {
+router.post("/signUp", async (req, res) => {
   const { email, password, phone, name } = req.body;
-  console.log(req.body);
-  User.findOne({ where: { email } })
-    .then((user) => {
-      if (user) {
-        res.json({ code: 0, message: "Email ID is already registered" });
-      } else {
-        const hashedPassword = bCrypt.hashSync(
-          password,
-          bCrypt.genSaltSync(8),
-          null
-        );
-        const user = User.build({
-          email,
-          phoneNo: phone,
-          name,
-          password: hashedPassword,
-        });
-        user.save().then((data) => {
-          res.json({
-            code: 1,
-            data: { message: "sign up successful. Login to continue" },
-          });
-        });
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      res.json({ code: 0, message: "error" });
+  try {
+    const user = await UserService.signUp(email, password, {
+      type: LoginTypes.EMAIL,
+      profile: { name, phoneNo: phone },
     });
+    res.json({
+      code: 1,
+      data: { message: "sign up successful. Login to continue" },
+    });
+  } catch (err) {
+    if (err instanceof UserExistsError) {
+      res.json({ code: 0, nessage: "user Exists" });
+    } else {
+      res.json({ code: 0, message: err.message });
+    }
+  }
 });
 
 router.post("/signIn", async (req, res, next) => {
@@ -193,6 +185,7 @@ router.post("/signIn", async (req, res, next) => {
     }
   });
 });
+router.post("/googleSignIn", async (req, res) => {});
 router.post("/adminSignIn", async (req, res, next) => {
   User.findOne({
     where: {
