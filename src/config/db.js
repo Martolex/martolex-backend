@@ -1,13 +1,9 @@
 const { config, env } = require("./config");
-
 const { Sequelize } = require("sequelize");
-// console.log(
-//   config.dbName,
-//   config.dbUserName,
-//   config.dbPassword,
-//   config.dbHost,
-//   config.dbPort
-// );
+const cls = require("cls-hooked");
+
+const transactionNamespace = cls.createNamespace("transactions");
+Sequelize.useCLS(transactionNamespace);
 
 var sequelize = new Sequelize(
   config.dbName,
