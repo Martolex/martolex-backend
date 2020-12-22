@@ -1,6 +1,3 @@
-const { User, UserAddress, SellerData } = require("../models");
-const { ValidationError } = require("sequelize");
-const { request } = require("express");
 const {
   UserProfileController,
   UserAddressController,

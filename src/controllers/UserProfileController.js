@@ -1,3 +1,6 @@
+const { User, UserAddress, SellerData } = require("../models");
+const { ValidationError } = require("sequelize");
+
 const UserAddressController = {
   getUserAddresses: async (req, res) => {
     const filters = { UserId: req.user.id };
