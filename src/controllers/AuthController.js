@@ -86,11 +86,7 @@ const AuthController = {
         data: { message: "sign up successful. Login to continue" },
       });
     } catch (err) {
-      if (err instanceof UserExistsError) {
-        res.json({ code: 0, nessage: "user Exists" });
-      } else {
-        res.json({ code: 0, message: err.message });
-      }
+      res.json({ code: 0, message: err.message });
     }
   },
   emailSignIn: async (req, res) => {
@@ -135,7 +131,6 @@ const AuthController = {
         },
       });
     } catch (err) {
-      console.log(err);
       if (
         err instanceof PasswordMismatchError ||
         err instanceof UserExistsError ||
