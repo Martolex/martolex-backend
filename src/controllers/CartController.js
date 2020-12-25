@@ -82,7 +82,7 @@ const CartController = {
     }
   },
   modifyQty: async (req, res) => {
-    const { bookId, qty = req.body };
+    const { bookId, qty } = req.body;
     if (!bookId || !qty || qty < 1) {
       res.json({ code: 0, message: "badd request" });
       return;
