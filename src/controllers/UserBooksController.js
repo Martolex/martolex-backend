@@ -58,9 +58,7 @@ const UserBooksController = {
         sellPrice,
         ...body
       } = req.body;
-      if (body.isDeleted || body.isApproved) {
-        res.json({ code: 0, message: "bad request" });
-      }
+
       await Book.create(
         {
           name,
@@ -123,9 +121,7 @@ const UserBooksController = {
         sellPrice,
         ...bookDetails
       } = req.body;
-      if (req.body.isDeleted || req.body.isApproved) {
-        res.json({ code: 0, message: "bad request" });
-      }
+
       await Book.update(
         {
           ...bookDetails,
@@ -158,9 +154,6 @@ const UserBooksController = {
   },
   deleteBook: async (req, res) => {
     try {
-      if (!req.body.bookId) {
-        res.json({ code: 0, message: "bad request" });
-      }
       await Book.update(
         { isDeleted: true },
         {
@@ -176,9 +169,6 @@ const UserBooksController = {
   },
 
   addReview: async (req, res) => {
-    if (!req.body.bookId) {
-      res.json({ code: 0, message: "bad request" });
-    }
     try {
       await BookReview.create({
         userId: req.user.id,
