@@ -21,14 +21,6 @@ const CartController = {
     }
   },
   addToCart: async (req, res) => {
-    if (
-      !req.body.bookId ||
-      !req.body.plan ||
-      !req.body.qty ||
-      req.body.isDeleted
-    ) {
-      res.json({ code: 0, message: "bad request" });
-    }
     const { bookId, plan, qty } = req.body;
     try {
       const newCartItem = await CartService.addItemToCart(req.user.id, {
@@ -49,27 +41,20 @@ const CartController = {
   },
 
   removeFromCart: async (req, res) => {
-    if (!req.body.bookId) {
-      res.json({ code: 0, message: "badd request" });
-    } else {
-      try {
-        await CartService.removeItem(req.user.id, req.body.bookId);
-        res.json({
-          code: 1,
-          data: { message: "cartItem removed Successfully" },
-        });
-      } catch (err) {
-        console.log(err);
-        res.json({ code: 0, message: "something went wrong" });
-      }
+    try {
+      await CartService.removeItem(req.user.id, req.body.bookId);
+      res.json({
+        code: 1,
+        data: { message: "cartItem removed Successfully" },
+      });
+    } catch (err) {
+      console.log(err);
+      res.json({ code: 0, message: "something went wrong" });
     }
   },
   modifyPlan: async (req, res) => {
     const { bookId, plan } = req.body;
-    if (!bookId || !plan) {
-      res.json({ code: 0, message: "badd request" });
-      return;
-    }
+
     try {
       await CartService.modifyPlan(req.user.id, bookId, plan);
       res.json({ code: 1, data: { message: "plan modified Successfully" } });
@@ -83,12 +68,8 @@ const CartController = {
   },
   modifyQty: async (req, res) => {
     const { bookId, qty } = req.body;
-    if (!bookId || !qty || qty < 1) {
-      res.json({ code: 0, message: "badd request" });
-      return;
-    }
     try {
-      await CartService.modifyQty(req.user.id);
+      await CartService.modifyQty(req.user.id, bookId, qty);
       res.json({
         code: 1,
         data: { message: "quantity modified Successfully" },

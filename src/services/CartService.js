@@ -99,7 +99,7 @@ class CartService {
   async computeDeliveryCharge(userId) {
     const deliveryCharge = { forward: 0, return: 0 };
     const cart = await Cart.findAll({
-      where: { userId: req.user.id },
+      where: { userId: userId },
       attributes: ["id"],
       include: {
         model: Book,
