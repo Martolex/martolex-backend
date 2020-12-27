@@ -361,10 +361,6 @@ const UserOrdersController = {
               data: { message: "Return request cancelled" },
             });
           }
-          res.json({
-            code: 1,
-            data: { message: "Return request cancelled" },
-          });
         } else {
           res.status(401).json({
             code: 0,
@@ -405,7 +401,7 @@ const UserOrdersController = {
       console.log(err);
       res.json({ code: 0, message: "something went wrong. Try again later" });
     }
-  }
+  },
 };
 
 module.exports = UserOrdersController;
