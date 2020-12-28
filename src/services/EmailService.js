@@ -28,6 +28,10 @@ class EmailBuilder {
   buildForgotPasswordEmail(emailId, link) {
     return new EmailService("FORGOT_PASSWORD", { email: emailId, link });
   }
+
+  buildOrderConfEmail(orderId) {
+    return new EmailService("ORDER_RECEIPT", { gatewayId: orderId });
+  }
 }
 
 module.exports = new EmailBuilder();

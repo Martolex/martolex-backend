@@ -3,6 +3,11 @@ const { Order } = require("../models");
 const querystring = require("querystring");
 const { paymentStatus } = require("../utils/enums");
 const verifySignature = require("../utils/Payments/verifySignature");
+const EmailBuilder = require("../services/EmailService");
+const AWS = require("aws-sdk");
+const Lambda = new AWS.Lambda();
+
+AWS.config.update({ region: "ap-south-1" });
 
 const PaymentController = {
   verifyPaymentCallBack: async (req, res) => {
@@ -19,6 +24,16 @@ const PaymentController = {
           { where: { gatewayOrderId: paymentDetails.orderId } }
         );
 
+        const orderConfEmail = EmailBuilder.buildOrderConfEmail(
+          paymentDetails.orderId
+        );
+        orderConfEmail.sendEmail((err, data) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(data);
+          }
+        });
         const orders = await Order.findAll({
           where: { gatewayOrderId: paymentDetails.orderId },
           attributes: ["id"],
