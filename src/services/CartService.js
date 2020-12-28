@@ -97,7 +97,7 @@ class CartService {
   }
 
   async computeDeliveryCharge(userId) {
-    const deliveryCharge = { forward: 0, return: 0 };
+    let deliveryCharge = { forward: 0, return: 0 };
     const cart = await Cart.findAll({
       where: { userId: userId },
       attributes: ["id"],

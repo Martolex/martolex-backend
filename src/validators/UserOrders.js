@@ -47,11 +47,7 @@ module.exports.createOrder = validate([
 ]);
 
 module.exports.getOrderAddress = validate([query("orderId").exists().isUUID()]);
-module.exports.getOrderDetails = validate([param("orderId").exists().isUUID()]);
-module.exports.retryPayment = body([param("orderId").exists().isUUID()]);
-module.exports.requestItemReturn = validate([
-  param("itemId").exists().isUUID(),
-]);
-module.exports.cancelReturnRequest = validate([
-  param("itemId").exists().isUUID(),
-]);
+module.exports.getOrderDetails = validate([]);
+module.exports.retryPayment = validate([]);
+module.exports.requestItemReturn = validate([]);
+module.exports.cancelReturnRequest = validate([]);
