@@ -25,12 +25,7 @@ class AuthService {
   }
 
   async signUp(email, password, { type, profile }) {
-    const user = await this.userService.findUserByEmail(email);
-    if (user) {
-      throw new UserExistsError("User already Exists");
-    } else {
-      this.userService.createUser(email, password, { type, profile });
-    }
+    this.userService.createUser(email, password, { type, profile });
   }
 
   async signInByEmail(email, password, options) {
