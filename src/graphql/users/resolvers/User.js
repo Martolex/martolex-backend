@@ -1,32 +1,29 @@
 const { AuthenticationError } = require("apollo-server");
-const AddressService = require("../../../services/AddressService");
-const { userService } = require("../../../services/AuthService");
-const UserService = require("../../../services/UserService");
-const { accounts } = require("../data");
+
 const User = {
-  async __resolveReference(object) {
+  async __resolveReference(object, _, { dataSources }) {
     console.log("here");
-    return await UserService.findById(object.id);
+    return await dataSources.userAPI.findById(object.id);
   },
-  async addresses({ id }) {
-    return await AddressService.getUserAddresses(id);
+  async addresses({ id }, args, { dataSources: { addressAPI } }) {
+    return await addressAPI.getUserAddresses(id);
   },
 };
 
 const userQueries = {
-  async User(parent, { email }, { user: { id, isAdmin } }) {
-    const user = await UserService.findUserByEmail(email);
-    console.log(isAdmin);
-    if (user.id !== id && !isAdmin)
+  async User(parent, { email }, { user: accessor, dataSources }) {
+    const user = await dataSources.userAPI.findByEmail(email);
+    if (!user) return null;
+    if (user.id !== accessor.id && accessor.isAdmin)
       throw new AuthenticationError("access denied");
     return user;
   },
 
-  async Users() {
-    return await UserService.getAll();
+  async Users(parent, args, { dataSources }) {
+    return await dataSources.userAPI.getAll();
   },
-  async activeUser(parent, args, { user }) {
-    return await userService.findById(user.id);
+  async activeUser(parent, args, { user, dataSources }) {
+    return await dataSources.userAPI.findById(user.id);
   },
 };
 

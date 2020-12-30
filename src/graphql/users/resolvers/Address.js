@@ -1,5 +1,3 @@
-const AddressService = require("../../../services/AddressService");
-
 const Address = {
   async __resolveReference(object) {
     console.log("here");

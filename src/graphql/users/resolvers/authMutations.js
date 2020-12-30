@@ -1,25 +1,24 @@
-const { accounts } = require("../data");
-const jwt = require("jsonwebtoken");
-const { config } = require("../../../config/config");
-const AuthService = require("../../../services/AuthService");
 const mutations = {
-  async login(parent, { email, password }) {
-    const { profile, token } = await AuthService.signInByEmail(email, password);
+  async login(parent, { email, password }, { dataSources }) {
+    const { profile, token } = await dataSources.authAPI.signIn(
+      email,
+      password
+    );
     return { token, profile };
   },
   async adminLogin(parent, { email, password }) {
-    const { profile, token } = await AuthService.signInByEmail(
+    const { profile, token } = await dataSources.authAPI.signIn(
       email,
       password,
-      { scope: { isAdmin: true } }
+      dataSources.authAPI.scopes.ADMIN
     );
     return { token, profile };
   },
   async ambassadorLogin(parent, { email, password }) {
-    const { profile, token } = await AuthService.signInByEmail(
+    const { profile, token } = await dataSources.authAPI.signIn(
       email,
       password,
-      { scope: { isAmbassador: true } }
+      dataSources.authAPI.scopes.AMBASSADOR
     );
     return { token, profile };
   },
