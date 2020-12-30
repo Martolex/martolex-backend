@@ -21,7 +21,7 @@ const logInput = () => {
 const server = new ApolloServer({
   schema: applyMiddleware(
     buildFederatedSchema([{ typeDefs, resolvers }]),
-    logInput()
+    permissions
   ),
   tracing: true,
   context: ({ req }) => {
