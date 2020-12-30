@@ -2,7 +2,6 @@
 // require("dotenv").config({ path: "./.env.test" });
 const Express = require("express");
 const App = Express();
-var session = require("express-session");
 const { config, env } = require("./config/config");
 const IndexRouter = require("./routes/index");
 const db = require("./config/db");
@@ -12,6 +11,18 @@ const models = require("./models/index");
 const RequestLogger = require("./middleware/Logging");
 const AWS = require("aws-sdk");
 const { scheduleCrons } = require("./crons");
+const createGraphQlServer = require("./graphql/createServer");
+const expressJwt = require("express-jwt");
+const port = process.env.port || config.port;
+
+App.use(
+  expressJwt({
+    secret: config.jwtSecret,
+    algorithms: ["HS256"],
+    credentialsRequired: false,
+  })
+);
+
 AWS.config.update({
   signatureVersion: "v4",
   region: "ap-south-1",
@@ -27,8 +38,6 @@ App.use(
   })
 );
 
-scheduleCrons();
-
 if (env == "dev") {
   // db.sync({ alter: true });
   //   .then(() => {
@@ -38,7 +47,18 @@ if (env == "dev") {
   // sessionStore.sync();
 }
 
-App.use(IndexRouter);
-App.listen(process.env.port || config.port, () => {
-  console.log("martolex server running");
-});
+const initServer = async () => {
+  const graphQlServer = await createGraphQlServer();
+  console.log("--------------------");
+  graphQlServer.applyMiddleware({ app: App });
+  console.log(
+    `graphql ready at ${config.host}:${config.port}${graphQlServer.graphqlPath}`
+  );
+  App.use(IndexRouter);
+  scheduleCrons();
+  App.listen(port, (req) => {
+    console.log("martolex server running");
+  });
+};
+
+initServer();

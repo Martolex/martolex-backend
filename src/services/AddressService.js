@@ -4,10 +4,17 @@ const { UserAddress } = require("../models");
 class AddressService {
   constructor() {}
 
-  async getAddressById(id, userId) {
-    const address = await UserAddress.findByPk(id, {
+  async getUserAddresses(userId) {
+    return await UserAddress.findAll({ where: { UserId: userId } });
+  }
+
+  async findById(id) {
+    return await UserAddress.findByPk(id, {
       attributes: [...Object.keys(UserAddress.rawAttributes)],
     });
+  }
+  async getAddressById(id, userId) {
+    const address = await this.findById(id);
     if (address.UserId !== userId)
       throw new PermissionError("Address does not belong to user");
 

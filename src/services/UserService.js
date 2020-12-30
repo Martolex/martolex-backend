@@ -7,7 +7,11 @@ class UserService {
     const user = await User.findOne({ where: { email } });
     return user;
   }
-  async findById(id, options) {
+
+  async getAll() {
+    return await User.findAll({});
+  }
+  async findById(id, options = {}) {
     const { attributes = Object.keys(User.rawAttributes) } = options;
     return await User.findByPk(id, { attributes });
   }

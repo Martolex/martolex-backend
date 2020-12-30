@@ -17,6 +17,13 @@ const { Sequelize } = require("../config/db");
 const PermissionError = require("../Exceptions/PermissionError");
 
 class OrderService {
+  async getAll() {
+    return await Order.findAll();
+  }
+
+  async getorderItems(id) {
+    return await OrderItem.findAll({ where: { orderId: id } });
+  }
   async findById(id, options = {}) {
     const { flat } = options;
     return await Order.findByPk(id, {
@@ -155,11 +162,12 @@ class OrderService {
     return result;
   }
 
-  async getUserOrders(userId) {
+  async getUserOrders(userId, options = {}) {
+    const { flat = false } = options;
     const orders = await Order.findAll({
       where: { userId },
       order: [["createdAt", "DESC"]],
-      include: [
+      include: !flat && [
         {
           model: OrderItem,
           as: "items",
