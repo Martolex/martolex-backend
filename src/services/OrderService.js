@@ -211,6 +211,10 @@ class OrderService {
 
     return order.address;
   }
+
+  async findOrderItemById(id) {
+    return await OrderItem.findByPk(id);
+  }
 }
 
 module.exports = new OrderService();

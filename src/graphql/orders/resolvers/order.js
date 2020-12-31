@@ -1,31 +1,24 @@
-const OrderService = require("../../../services/OrderService");
-
 const Order = {
-  async __resolveReference(object) {
-    return await OrderService.findById(object.id, { flat: true });
+  async __resolveReference(object, _, { dataSources: { orders } }) {
+    return await orders.findById(object.id, { flat: true });
   },
-  async items({ id }) {
-    return await OrderService.getorderItems(id);
+  async items({ id }, _, { dataSources: { orders } }) {
+    return await orders.getOrderItems(id);
   },
   customer({ userId }) {
     return { id: userId };
   },
   deliveryAddress({ addressId }) {
-    console.log(addressId);
-    const type = { id: addressId };
-    console.log(type);
-    return type;
+    return { id: addressId };
   },
 };
 
 const orderQueries = {
-  async orders(_, __, { user }) {
-    return user.isAdmin
-      ? await OrderService.getAll()
-      : OrderService.getUserOrders(user.id, { flat: true });
+  async orders(_, __, { dataSources: { orders } }) {
+    return await orders.getAllOrders();
   },
-  async orderById(_, { id }, context) {
-    return await OrderService.findById(id, { flat: true });
+  async orderById(_, { id }, { dataSources: { orders } }) {
+    return await orders.findById(id, { flat: true });
   },
 };
 
