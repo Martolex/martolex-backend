@@ -1,7 +1,7 @@
 const Address = {
-  async __resolveReference(object) {
+  async __resolveReference(object, { dataSources }) {
     console.log("here");
-    return await AddressService.findById(object.id);
+    return await dataSources.addressAPI.findById(object.id);
   },
 };
 

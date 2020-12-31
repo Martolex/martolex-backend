@@ -1,8 +1,8 @@
 const { AuthenticationError } = require("apollo-server");
 
 const User = {
-  async __resolveReference(object, _, { dataSources }) {
-    console.log("here");
+  async __resolveReference(object, { dataSources }) {
+    console.log(dataSources);
     return await dataSources.userAPI.findById(object.id);
   },
   async addresses({ id }, args, { dataSources: { addressAPI } }) {
