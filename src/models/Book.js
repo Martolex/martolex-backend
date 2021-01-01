@@ -4,7 +4,11 @@ const { Model, DataTypes, Sequelize, UUIDV4, Op } = require("sequelize");
 const { isValidISBN } = require("../utils/customValidators");
 const { approvalStates } = require("../utils/enums");
 
-class Book extends Model {}
+class Book extends Model {
+  approval() {
+    return this.isApproved === approvalStates.APPROVED;
+  }
+}
 
 Book.init(
   {
