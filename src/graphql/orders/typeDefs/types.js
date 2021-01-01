@@ -20,6 +20,11 @@ const types = gql`
     deliveryAddress: Address
   }
 
+  extend type Book @key(fields: "id") {
+    id: ID! @external
+    orders: [Order]!
+  }
+
   extend type User @key(fields: "id") {
     id: ID! @external
     orders: [Order]!
@@ -38,7 +43,7 @@ const types = gql`
     returnRequestDate: Date
     rent: Float
     deposit: Float
-    bookId: String!
+    book: Book!
     order: Order!
   }
 `;

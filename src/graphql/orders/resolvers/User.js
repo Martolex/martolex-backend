@@ -1,8 +1,6 @@
-const OrderService = require("../../../services/OrderService");
-
 const User = {
-  async orders({ id }) {
-    return await OrderService.getUserOrders(id, { flat: true });
+  async orders({ id }, _, { dataSource }) {
+    return await dataSource.orders.getUserOrders(id);
   },
 };
 

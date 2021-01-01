@@ -7,7 +7,7 @@ var waitOn = require("wait-on");
 const createGraphQlServer = async () => {
   try {
     concurrently(["concurrently -k npm:server:*"]);
-    await waitOn({ resources: ["tcp:4001", "tcp:4002"] });
+    await waitOn({ resources: ["tcp:4001", "tcp:4002", "tcp:4003"] });
   } catch (err) {
     throw err;
   }
@@ -15,6 +15,7 @@ const createGraphQlServer = async () => {
     serviceList: [
       { name: "users", url: "http://localhost:4001" },
       { name: "orders", url: "http://localhost:4002" },
+      { name: "books", url: "http://localhost:4003" },
     ],
     buildService({ name, url }) {
       return new RemoteGraphQLDataSource({

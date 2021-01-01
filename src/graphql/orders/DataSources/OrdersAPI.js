@@ -26,6 +26,13 @@ class OrdersAPI extends DataSource {
   getOrderItemById(id) {
     return this.service.findOrderItemById(id);
   }
+
+  getUserOrders(id) {
+    return this.service.getUserOrders(id, { flat: true });
+  }
+  getOrdersByBook(bookId) {
+    return this.service.getOrdersByBook(bookId);
+  }
 }
 
 module.exports = OrdersAPI;

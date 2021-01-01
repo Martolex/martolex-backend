@@ -9,7 +9,8 @@
     "start-dev": "nodemon src/app.js",
     "server": "concurrently -k npm:server:*",
     "server:users": "node src/graphql/users/index.js",
-    "server:orders": "node src/graphql/orders/index.js"
+    "server:orders": "node src/graphql/orders/index.js",
+    "server:books": "node src/graphql/books/index.js"
   },
   "repository": {
     "type": "git",

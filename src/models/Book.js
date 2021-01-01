@@ -43,6 +43,7 @@ Book.init(
     scopes: {
       available: {
         where: {
+          isDeleted: false,
           quantity: { [Op.gt]: 0 },
           isApproved: approvalStates.APPROVED,
         },
