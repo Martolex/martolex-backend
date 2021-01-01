@@ -162,6 +162,14 @@ class OrderService {
     return result;
   }
 
+  async getOrdersByBook(bookId) {
+    let orders = await OrderItem.findAll({
+      where: { bookId },
+      include: { model: Order, as: "order" },
+    });
+    return orders.map((item) => item.toJSON().order);
+  }
+
   async getUserOrders(userId, options = {}) {
     const { flat = false } = options;
     const orders = await Order.findAll({
