@@ -15,7 +15,7 @@ const entities = gql`
     quantity: Int!
     isbn: String!
     description: String
-    isApproved: APPROVAL_STATES!
+    isApproved: APPROVAL_STATES! @auth(requires: [ADMIN])
     isBuyBackEnabled: Boolean!
     images(coverOnly: Boolean): [BookImages]
     rent: Rent
@@ -26,7 +26,7 @@ const entities = gql`
 
   type BookImages {
     url: String!
-    isDeleted: Boolean!
+    isDeleted: Boolean! @auth(requires: [ADMIN])
     isCover: Boolean!
   }
 
@@ -45,7 +45,7 @@ const entities = gql`
     id: ID!
     review: String!
     rating: Int!
-    isDeleted: Boolean!
+    isDeleted: Boolean! @auth(requires: [ADMIN])
   }
 
   type Category {

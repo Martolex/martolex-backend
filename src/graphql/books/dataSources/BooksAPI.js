@@ -1,5 +1,6 @@
 const { DataSource } = require("apollo-datasource");
-
+const { Roles } = require("../authorization");
+const { ApolloError } = require("apollo-server");
 class BooksAPI extends DataSource {
   constructor({ service }) {
     super();
@@ -9,8 +10,13 @@ class BooksAPI extends DataSource {
   initialize({ context }) {
     this.context = context;
   }
-  getById(id) {
-    return this.service.findById(id);
+  async getById(id) {
+    const book = await this.service.findById(id);
+    const requiredRoles = [Roles.ADMIN];
+    const isApproved = book.approval();
+    if (!isApproved && !this.context.user.hasRoles(requiredRoles))
+      throw new ApolloError("You can not access this book", "UNAUTHORIZED");
+    return book;
   }
   getImages(id, options) {
     return this.service.getBookImages(id, options);
