@@ -11,12 +11,8 @@ const CategoriesService = require("../../services/CategoriesService");
 const port = 4003;
 
 const schema = buildFederatedSchema([{ typeDefs, resolvers }]);
-SchemaDirectiveVisitor.visitSchemaDirectives(schema, directives); // NEW!
+SchemaDirectiveVisitor.visitSchemaDirectives(schema, directives);
 
-// const schema = mergeSchemas({
-//   schemas: [federatedSchema],
-//   schemaDirectives: { ...AuthDirectives },
-// });
 const server = new ApolloServer({
   schema,
   tracing: true,
