@@ -3,7 +3,6 @@ const { Roles } = require("../authorization");
 
 const User = {
   async __resolveReference(object, { dataSources, user }) {
-    console.log(user.roles);
     return await dataSources.userAPI.findById(object.id);
   },
   async addresses({ id }, args, { dataSources: { addressAPI } }) {

@@ -19,6 +19,7 @@ const entities = gql`
     isBuyBackEnabled: Boolean!
     images(coverOnly: Boolean): [BookImages]
     rent: Rent
+    rating: Float
     uploader: User!
     subCategory: SubCategory
     reviews: [BookReview]
