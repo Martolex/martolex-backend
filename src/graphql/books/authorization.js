@@ -15,6 +15,7 @@ const authTypes = gql`
     AMBASSADOR
     ADMIN
     GUEST
+    LOGGEDIN
   }
 `;
 
@@ -66,11 +67,13 @@ const Roles = {
   AMBASSADOR: "AMBASSADOR",
   ADMIN: "ADMIN",
   GUEST: "GUEST",
+  LOGGEDIN: "LOGGEDIN",
 };
 
 const getRoles = (user) => {
   const roles = [];
   if (user) {
+    roles.push(Roles.LOGGEDIN);
     if (user.isAdmin) {
       roles.push(Roles.ADMIN);
     }
