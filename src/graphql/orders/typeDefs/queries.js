@@ -2,8 +2,11 @@ const { gql } = require("apollo-server");
 
 const queries = gql`
   extend type Query {
-    orders: [Order!]!
-    orderById(id: String!): Order
+    orders: [Order!]! @auth(requires: [LOGGEDIN])
+    orderById(id: String!): Order @auth(requires: [LOGGEDIN])
+
+    ambassadorOrders(type: AMBASSADOR_ORDER_SOURCES): Order
+      @auth(requires: [AMBASSADOR])
   }
 `;
 

@@ -1,6 +1,6 @@
 const User = {
-  async orders({ id }, _, { dataSource }) {
-    return await dataSource.orders.getUserOrders(id);
+  async orders({ id }, _, { dataSources }) {
+    return await dataSources.orders.getUserOrders(id);
   },
 };
 

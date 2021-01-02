@@ -7,9 +7,9 @@ const types = gql`
     paymentStatus: PAYMENT_STATUS!
     referralCode: String
     orderStatus: ORDER_STATUS!
-    gatewayOrderId: String!
-    gatewayRefId: String
-    gateWayMode: String
+    gatewayOrderId: String! @auth(requires: [ADMIN])
+    gatewayRefId: String @auth(requires: [ADMIN])
+    gateWayMode: String @auth(requires: [ADMIN])
     deliveryMinDate: Date!
     deliveryMaxDate: Date!
     actualDeliveryDate: Date!
@@ -22,12 +22,12 @@ const types = gql`
 
   extend type Book @key(fields: "id") {
     id: ID! @external
-    orders: [Order]!
+    orders: [Order]! @auth(requires: [LOGGEDIN])
   }
 
   extend type User @key(fields: "id") {
     id: ID! @external
-    orders: [Order]!
+    orders: [Order]! @auth(requires: [LOGGEDIN])
   }
 
   extend type Address @key(fields: "id") {

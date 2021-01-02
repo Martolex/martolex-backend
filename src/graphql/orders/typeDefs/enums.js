@@ -24,6 +24,11 @@ const enums = gql`
     SELL
   }
 
+  enum AMBASSADOR_ORDER_SOURCES {
+    LEADS
+    COUPON_CODE
+  }
+
   enum RETURN_STATES {
     NOT_RETURNED
     RETURN_REQUESTED
