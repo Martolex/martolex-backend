@@ -1,4 +1,3 @@
-const passport = require("passport");
 const { User, Colleges, PasswordResetRequests } = require("../models");
 const { config } = require("../config/config");
 const jwt = require("jsonwebtoken");

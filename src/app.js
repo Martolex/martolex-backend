@@ -2,7 +2,6 @@
 // require("dotenv").config({ path: "./.env.test" });
 const Express = require("express");
 const App = Express();
-var session = require("express-session");
 const { config, env } = require("./config/config");
 const IndexRouter = require("./routes/index");
 const db = require("./config/db");
