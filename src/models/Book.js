@@ -4,11 +4,7 @@ const { Model, DataTypes, Sequelize, UUIDV4, Op } = require("sequelize");
 const { isValidISBN } = require("../utils/customValidators");
 const { approvalStates } = require("../utils/enums");
 
-class Book extends Model {
-  approval() {
-    return this.isApproved === approvalStates.APPROVED;
-  }
-}
+class Book extends Model {}
 
 Book.init(
   {
@@ -33,6 +29,9 @@ Book.init(
     isApproved: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+      get() {
+        return this.getDataValue("isApproved") === approvalStates.APPROVED;
+      },
     },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
     isBuyBackEnabled: { type: DataTypes.BOOLEAN, defaultValue: true },
