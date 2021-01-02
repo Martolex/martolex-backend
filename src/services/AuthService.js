@@ -157,7 +157,6 @@ class AuthService {
       where: { userId: user.id },
       include: { model: Colleges, as: "college", attributes: ["name", "id"] },
     });
-    console.log(ambassador.college);
     return {
       ...user,
       ambassadorId: ambassador.id,
