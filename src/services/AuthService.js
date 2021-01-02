@@ -14,7 +14,11 @@ const sequelize = require("../config/db");
 const UserService = require("./UserService");
 const genPasswordResetLink = require("../utils/genPasswordResetLink");
 const EmailBuilder = require("./EmailService");
-const { PasswordResetRequests } = require("../models");
+const {
+  PasswordResetRequests,
+  AmbassadorDetails,
+  Colleges,
+} = require("../models");
 const moment = require("moment");
 const { Op } = require("sequelize");
 
@@ -120,14 +124,20 @@ class AuthService {
   async signIn(user, password, options) {
     const { scope = {}, attributes, type = LoginTypes.EMAIL } = options || {};
     if (user) {
-      const { password: hash, ...profile } = user.toJSON();
+      let { password: hash, ...userInfo } = user.toJSON();
       const authenticated =
         type === LoginTypes.EMAIL ? this._verifyPassword(password, hash) : true;
       if (authenticated) {
-        if (this._verifyScope(profile, scope)) {
+        if (this._verifyScope(userInfo, scope)) {
+          if (user.isAmbassador) {
+            userInfo = await this._generateAmbassadorProfile(userInfo);
+          }
+          const profile = this._getProfile(userInfo, attributes);
+
+          const token = this._generateToken(profile);
           return {
             token: this._generateToken(profile),
-            profile: this._getProfile(profile, attributes),
+            profile,
           };
         } else {
           throw new UnauthorizedError(
@@ -140,6 +150,19 @@ class AuthService {
     } else {
       throw new UserExistsError("User does not exist");
     }
+  }
+
+  async _generateAmbassadorProfile(user) {
+    const ambassador = await AmbassadorDetails.findOne({
+      where: { userId: user.id },
+      include: { model: Colleges, as: "college", attributes: ["name", "id"] },
+    });
+    console.log(ambassador.college);
+    return {
+      ...user,
+      ambassadorId: ambassador.id,
+      college: ambassador.college,
+    };
   }
 
   _verifyScope(user, scope) {
