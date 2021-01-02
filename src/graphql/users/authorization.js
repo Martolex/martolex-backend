@@ -3,7 +3,7 @@ const { defaultFieldResolver } = require("graphql");
 
 const hasRoles = (user) => (requiredRoles) => {
   const roles = getRoles(user);
-  return requiredRoles.every((requiredRole) => roles.includes(requiredRole));
+  return requiredRoles.some((requiredRole) => roles.includes(requiredRole));
 };
 
 const authTypes = gql`
