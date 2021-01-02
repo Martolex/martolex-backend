@@ -5,12 +5,12 @@ const entities = gql`
     id: ID!
     name: String!
     email: String!
-    password: String!
-    phoneNo: String!
-    isAdmin: Boolean!
-    isSeller: Boolean!
-    isAmbassador: Boolean!
-    addresses: [Address!]
+    password: String! @auth(requires: [ADMIN])
+    phoneNo: String! @auth(requires: [ADMIN, CUSTOMER])
+    isAdmin: Boolean! @auth(requires: [ADMIN])
+    isSeller: Boolean! @auth(requires: [ADMIN])
+    isAmbassador: Boolean! @auth(requires: [ADMIN])
+    addresses: [Address!] @auth(requires: [ADMIN, CUSTOMER])
   }
 
   type Address @key(fields: "id") {
