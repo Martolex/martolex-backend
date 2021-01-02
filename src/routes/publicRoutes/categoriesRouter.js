@@ -1,28 +1,13 @@
 const { Categories, SubCategories } = require("../../models");
-
+const CategoriesController = require("../../controllers/adminControllers/CategoriesController");
 const router = require("express").Router();
 
-router.route("/").get(async (req, res) => {
-  const categories = await Categories.findAll();
-  res.json({ code: 1, data: categories });
-});
+router.route("/").get(CategoriesController.categories.getAllCategories);
 
-router.route("/subCategories/:id").get(async (req, res) => {
-  const subCategories = await SubCategories.findAll({
-    where: { parentCategory: req.params.id },
-  });
-  res.json({ code: 1, data: subCategories });
-});
+router
+  .route("/subCategories/:id")
+  .get(CategoriesController.categories.getSubcategories);
 
-router.get("/tree", async (req, res) => {
-  try {
-    const categories = await Categories.findAll({
-      include: { model: SubCategories, as: "subcategories" },
-    });
-    res.json({ code: 1, data: { categories } });
-  } catch (err) {
-    res.json({ code: 0, message: "something went wrong" });
-  }
-});
+router.get("/tree", CategoriesController.tree);
 
 module.exports = router;

@@ -42,6 +42,8 @@ const returnStates = {
 const approvalStates = { PENDING: 0, NOT_APPROVED: -1, APPROVED: 1 };
 const sellerTypes = { MARTOLEX: true, OTHERS: false };
 
+const LoginTypes = { EMAIL: "EMAIL", GOOGLE: "GOOGLE" };
+
 module.exports = {
   plans,
   paymentModes,
@@ -51,4 +53,5 @@ module.exports = {
   returnStates,
   sellerTypes,
   approvalStates,
+  LoginTypes,
 };
