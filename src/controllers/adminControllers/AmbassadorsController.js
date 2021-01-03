@@ -31,11 +31,32 @@ const AmbassadorController = {
       res.status(400).json({ code: 0, message: "bad request" });
     } else {
       try {
-        AmbassadorDetails.create({ ...req.body });
-        User.update({ isAmbassador: true }, { where: { id: req.body.userId } });
+        await sequelize.transaction(async (t) => {
+          const ambassador = await AmbassadorDetails.findOne({
+            where: { userId: req.body.userId },
+          });
+          let ambassadorPromise = null;
+          if (ambassador) {
+            if (!ambassador.isActive) {
+              ambassador.isActive = true;
+              ambassador.startDate = new Date();
+              ambassador.endDate = null;
+              ambassadorPromise = ambassador.save();
+            } else {
+              throw new Error("Ambassador Exists");
+            }
+          } else {
+            ambassadorPromise = AmbassadorDetails.create({ ...req.body });
+          }
+          const userPromise = User.update(
+            { isAmbassador: true },
+            { where: { id: req.body.userId } }
+          );
+
+          await Promise.all([ambassadorPromise, userPromise]);
+        });
         res.json({ code: 1, data: { message: "created" } });
       } catch (err) {
-        console.log(err);
         if (err instanceof ValidationError) {
           if (err.errors[0].type == "unique violation")
             res.json({ code: 0, message: "ambassador exists" });
@@ -46,6 +67,8 @@ const AmbassadorController = {
           } else if (err.fields[0] == "collegeId") {
             res.json({ code: 0, message: "invalid College" });
           }
+        } else {
+          res.json({ code: 0, message: err.message });
         }
       }
     }
@@ -58,14 +81,15 @@ const AmbassadorController = {
       include: {
         model: AmbassadorDetails,
         as: "ambassador",
-        required: false,
-        attributes: ["id"],
+        required: true,
+        attributes: ["id", "isActive"],
       },
     });
+    const isValid = user ? (user.ambassador.isActive ? false : true) : true;
     res.json({
       code: 1,
       data: {
-        isValid: user ? !user.ambassador : false,
+        isValid,
         id: user && user.id,
       },
     });

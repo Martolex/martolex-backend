@@ -181,24 +181,23 @@ const AuthController = {
         req.body.password,
         {
           scope: { isAmbassador: true },
-          attributes: ["id", "name", "email", "phoneNo"],
+          attributes: [
+            "id",
+            "name",
+            "email",
+            "phoneNo",
+            "ambassadorId",
+            "college",
+          ],
         }
       );
-      const { college } = (
-        await AmbassadorDetails.findOne({
-          where: { isActive: true },
-          include: [
-            { model: Colleges, as: "college", attributes: ["name", "id"] },
-          ],
-        })
-      ).toJSON();
-      console.log();
+
       res.status(200).send({
         code: 1,
         data: {
           auth: true,
           token,
-          profile: { ...profile, college },
+          profile,
           message: "user found & logged in",
         },
       });
