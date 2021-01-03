@@ -136,7 +136,7 @@ class AuthService {
 
           const token = this._generateToken(profile);
           return {
-            token: this._generateToken(profile),
+            token,
             profile,
           };
         } else {
@@ -183,16 +183,21 @@ class AuthService {
     return { name, email };
   }
 
+  _generateJWTPayload(user) {
+    let payload = {
+      id: user.id,
+      type: "user",
+      isAdmin: user.isAdmin,
+      isAmbassador: user.isAmbassador,
+    };
+    if (payload.isAmbassador) {
+      payload.college = user.college;
+      payload.ambassadorId = user.ambassadorId;
+    }
+  }
+
   _generateToken(user) {
-    const token = jwt.sign(
-      {
-        id: user.id,
-        type: "user",
-        isAdmin: user.isAdmin,
-        isSeller: user.isSeller,
-      },
-      config.jwtSecret
-    );
+    const token = jwt.sign(this._generateJWTPayload(user), config.jwtSecret);
 
     return token;
   }
