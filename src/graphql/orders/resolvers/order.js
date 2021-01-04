@@ -2,7 +2,7 @@ const Order = {
   async __resolveReference(object, _, { dataSources: { orders } }) {
     return await orders.findById(object.id, { flat: true });
   },
-  async items({ id }, _, { dataSources: { orders } }) {
+  async items({ id }, _, { dataSources: { orders }, ...context }, info) {
     return await orders.getOrderItems(id);
   },
   customer({ userId }) {
@@ -14,8 +14,8 @@ const Order = {
 };
 
 const orderQueries = {
-  async orders(_, __, { dataSources: { orders } }) {
-    return await orders.getAllOrders();
+  async orders(_, { userType }, { dataSources: { orders } }) {
+    return await orders.getAllOrders(userType);
   },
   async orderById(_, { id }, { dataSources: { orders } }) {
     return await orders.findById(id, { flat: true });

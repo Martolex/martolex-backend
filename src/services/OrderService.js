@@ -13,12 +13,45 @@ const orderUtils = require("../utils/orderUtils");
 const { plans, returnStates, paymentModes } = require("../utils/enums");
 const { v4: UUIDV4 } = require("uuid");
 const getPaymentLink = require("../utils/Payments/getPaymentLink");
-const { Sequelize } = require("../config/db");
+const Sequelize = require("sequelize");
 const PermissionError = require("../Exceptions/PermissionError");
 
 class OrderService {
   async getAll() {
     return await Order.findAll();
+  }
+
+  async getAmbassadorOrders(ambassadorId) {
+    ambassadorId = sequelize.escape(ambassadorId);
+    const leadsSubQuery = `(Select email from Leads where ambassador=${ambassadorId})`;
+    const orders = Order.findAll({
+      include: {
+        model: User,
+        as: "user",
+        attributes: [],
+        required: true,
+        where: {
+          email: { [Sequelize.Op.in]: Sequelize.literal(leadsSubQuery) },
+        },
+      },
+    });
+    return orders;
+  }
+  async getSellerOrders({ sellerId }) {
+    const orders = await Order.findAll({
+      include: {
+        model: OrderItem,
+        as: "items",
+        required: true,
+        include: {
+          model: Book,
+          as: "book",
+          where: { uploader: sellerId },
+          required: true,
+        },
+      },
+    });
+    return orders;
   }
 
   async getorderItems(id) {
