@@ -88,6 +88,7 @@ const UserOrdersController = {
         data: { message: "Return request submitted successfully" },
       });
     } catch (err) {
+      console.log(err);
       if (err instanceof TypeError || err instanceof PermissionError)
         res.json({ code: 0, message: err.message });
       else res.json({ code: 0, message: "something went wrong" });
