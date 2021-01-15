@@ -1,4 +1,4 @@
-const { config } = require("../config/config");
+const { config, env } = require("../config/config");
 const { Order } = require("../models");
 const querystring = require("querystring");
 const { paymentStatus } = require("../utils/enums");
@@ -12,7 +12,11 @@ AWS.config.update({ region: "ap-south-1" });
 const PaymentController = {
   verifyPaymentCallBack: async (req, res) => {
     const paymentDetails = req.body;
-    const USER_APP = `${config.applications.USER_APP}/order`;
+    const USER_APP = `${
+      env === "production"
+        ? config.applications.USER_APP
+        : config.applications.TEST_USER_APP
+    }/order`;
     if (verifySignature(paymentDetails)) {
       if (paymentDetails.txStatus == "SUCCESS") {
         Order.update(

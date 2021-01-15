@@ -26,6 +26,8 @@ App.use(
   })
 );
 
+console.log(config.applications);
+
 scheduleCrons();
 
 if (env == "dev") {

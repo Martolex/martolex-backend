@@ -1,8 +1,16 @@
-require("dotenv").config({ path: "./.env.prod" });
+require("dotenv").config({ path: "../.env.prod" });
+const { config } = require("../src/config/config");
+const fetch = require("node-fetch");
+const aws = require("aws-sdk");
+const s3 = new aws.S3();
+aws.config.update({
+  signatureVersion: "v4",
+  region: "ap-south-1",
+});
 
 console.log(process.env.DBHOST);
-const db = require("../config/db");
-
+const db = require("../src/config/db");
+// process.exit(0);
 const { Sequelize } = require("sequelize");
 const {
   Categories,
@@ -10,13 +18,13 @@ const {
   Book,
   BookRent,
   BookImages,
-} = require("../models");
+} = require("../src/models");
 
 db.authenticate()
   .then(() => "Connection has been established successfully.")
   .catch((err) => console.log(err));
 
-var oldDb = new Sequelize("martolex", "root", "", {
+var oldDb = new Sequelize("martolex-old-prod", "root", "", {
   host: "localhost",
   port: 3306,
   dialect: "mysql",
@@ -68,12 +76,15 @@ oldDb
               rentId: newBookRent.id,
             });
             console.log(`bookid = ${book.book_code} book created`);
+            console.log(`bookid = ${book.book_code} fetching image`);
+
             const bookImage = await BookImages.create({
               isCover: 1,
-              url: `https://www.martolex.com/uploads/book_header_img/${book.book_image}`,
+              url: `https://martolex-book-images.s3.ap-south-1.amazonaws.com/book_header_img/${book.book_image}`,
               BookId: newBook.id,
             });
             console.log(`bookid = ${book.book_code} image created`);
+            console.log(`-----------------------`);
           }
           return newsubCat;
         });
