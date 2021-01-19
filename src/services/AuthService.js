@@ -132,6 +132,7 @@ class AuthService {
           if (user.isAmbassador) {
             userInfo = await this._generateAmbassadorProfile(userInfo);
           }
+          console.log(userInfo);
 
           const token = this._generateToken(userInfo);
 
@@ -162,6 +163,7 @@ class AuthService {
       ...user,
       ambassadorId: ambassador.id,
       college: ambassador.toJSON().college,
+      referralCode: ambassador.referralCode,
     };
   }
 

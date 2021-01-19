@@ -10,7 +10,7 @@ College.init(
       allowsNull: false,
       primaryKey: true,
     },
-    name: { type: DataTypes.STRING, allowNull: false, unique: true },
+    name: { type: DataTypes.STRING, allowNull: false },
     city: { type: DataTypes.STRING, allowNull: false },
   },
   {
