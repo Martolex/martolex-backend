@@ -27,7 +27,7 @@ const AmbassadorController = {
     }
   },
   addNewAmbassador: async (req, res) => {
-    if (!req.body.collegeId || !req.body.userId || req.body.isActive) {
+    if (!req.body.collegeId || !req.body.userId) {
       res.status(400).json({ code: 0, message: "bad request" });
     } else {
       try {
@@ -57,6 +57,7 @@ const AmbassadorController = {
         });
         res.json({ code: 1, data: { message: "created" } });
       } catch (err) {
+        console.log(err);
         if (err instanceof ValidationError) {
           if (err.errors[0].type == "unique violation")
             res.json({ code: 0, message: "ambassador exists" });
@@ -81,11 +82,16 @@ const AmbassadorController = {
       include: {
         model: AmbassadorDetails,
         as: "ambassador",
-        required: true,
+        // required: true,
         attributes: ["id", "isActive"],
       },
     });
-    const isValid = user ? (user.ambassador.isActive ? false : true) : true;
+    const { ambassador } = user;
+    const isValid = user
+      ? ambassador && ambassador.isActive
+        ? false
+        : true
+      : true;
     res.json({
       code: 1,
       data: {

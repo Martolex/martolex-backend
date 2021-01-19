@@ -1,6 +1,7 @@
 const { commisionRate } = require("../../config/ambassadorConfig");
 const sequelize = require("../../config/db");
 const { Leads } = require("../../models");
+const { paymentStatus } = require("../../utils/enums");
 const { Op, Sequelize } = require("sequelize");
 const moment = require("moment");
 
@@ -46,7 +47,7 @@ const statsController = {
               from Orders o inner join OrderItems oi inner join Users u 
               on o.id = oi.orderId and o.userId = u.id 
               LEFT OUTER JOIN Leads l 
-              on u.email = l.email WHERE 
+              on u.email = l.email WHERE o.paymentStatus='${paymentStatus.PAID}' and
               l.ambassador='${req.user.ambassadorId}' OR o.referralCode = (SELECT referralCode from AmbassadorDetails where id='${req.user.ambassadorId}')
               ) as od WHERE time_to_sec(timediff(orderDate , leadCreationDate)) > 0 OR referralCode IS NOT NULL 
               ORDER BY orderDate DESC`;

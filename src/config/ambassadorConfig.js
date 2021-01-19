@@ -1,1 +1,1 @@
-module.exports.commisionRate = 5 / 100;
+module.exports.commisionRate = 2 / 100;
