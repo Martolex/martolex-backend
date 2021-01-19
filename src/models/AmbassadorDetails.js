@@ -30,14 +30,6 @@ AmbassadorDetails.init(
   {
     sequelize: db,
     indexes: [{ type: "UNIQUE", fields: ["userId"] }],
-    hooks: {
-      beforeValidate: (ambassadorDetails) => {
-        ambassadorDetails.referralCode = referralCodeGenerator.alpha(
-          "uppercase",
-          6
-        );
-      },
-    },
   }
 );
 module.exports = AmbassadorDetails;
