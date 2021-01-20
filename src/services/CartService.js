@@ -82,7 +82,7 @@ class CartService {
   }
 
   async removeItem(userId, BookId) {
-    await Cart.destroy({ where: userId, BookId });
+    await Cart.destroy({ where: { userId, BookId } });
   }
 
   async modifyPlan(userId, BookId, plan) {
