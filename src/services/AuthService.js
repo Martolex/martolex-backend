@@ -132,9 +132,11 @@ class AuthService {
           if (user.isAmbassador) {
             userInfo = await this._generateAmbassadorProfile(userInfo);
           }
-          const profile = this._getProfile(userInfo, attributes);
+          console.log(userInfo);
 
-          const token = this._generateToken(profile);
+          const token = this._generateToken(userInfo);
+
+          const profile = this._getProfile(userInfo, attributes);
           return {
             token,
             profile,
@@ -160,7 +162,8 @@ class AuthService {
     return {
       ...user,
       ambassadorId: ambassador.id,
-      college: ambassador.college,
+      college: ambassador.toJSON().college,
+      referralCode: ambassador.referralCode,
     };
   }
 
@@ -194,11 +197,11 @@ class AuthService {
       payload.college = user.college;
       payload.ambassadorId = user.ambassadorId;
     }
+    return payload;
   }
 
   _generateToken(user) {
     const token = jwt.sign(this._generateJWTPayload(user), config.jwtSecret);
-
     return token;
   }
 

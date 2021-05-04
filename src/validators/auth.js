@@ -15,7 +15,7 @@ module.exports.signUp = validate([
       });
     }),
   body("password").exists().isLength({ min: 8 }),
-  body("name").exists().isAlpha(),
+  body("name").exists(),
   body("phone").optional().isInt(),
 ]);
 

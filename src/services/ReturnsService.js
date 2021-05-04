@@ -1,11 +1,11 @@
 const PermissionError = require("../Exceptions/PermissionError");
-const { Order, User } = require("../models");
+const { Order, User, OrderItem } = require("../models");
 const { returnStates } = require("../utils/enums");
 
 class ReturnService {
   constructor() {}
 
-  async getItemById() {
+  async getItemById(itemId) {
     return await OrderItem.findByPk(itemId, {
       include: {
         model: Order,
@@ -23,7 +23,7 @@ class ReturnService {
       throw new PermissionError("You are not authorized to return this order");
 
     item.isReturned = returnStates.RETURN_REQUESTED;
-    item.returnRequestDate = new Date.now();
+    item.returnRequestDate = Date.now();
     await item.save();
   }
 

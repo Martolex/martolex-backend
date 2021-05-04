@@ -6,7 +6,6 @@ module.exports.createCartItem = (item) => {
       ? item.book.rent[item.plan]
       : item.book.rent.deposit;
   const itemRent = item.book.rent[item.plan];
-  console.log(item.book);
   return {
     qty: item.qty,
     price: itemPrice,
@@ -18,6 +17,7 @@ module.exports.createCartItem = (item) => {
       name: item.book.name,
       images: item.book.images,
       mrp: item.book.rent.mrp,
+      quantity: item.book.quantity,
     },
   };
 };

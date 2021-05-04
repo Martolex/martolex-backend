@@ -7,7 +7,10 @@ const CartService = require("../services/CartService");
 const CartController = {
   getUserCart: async (req, res) => {
     try {
-      let cart = await CartService.getUserCart(req.user.id, { images: true });
+      let cart = await CartService.getUserCart(req.user.id, {
+        images: true,
+        bookAttributes: ["quantity"],
+      });
       cart = cart.map((item) => {
         return createCartItem(item);
       });

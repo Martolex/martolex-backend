@@ -33,10 +33,15 @@ App.use(bodyParser.urlencoded({ extended: true }));
 
 App.use(
   cors({
-    origin: Object.values(config.applications),
+    origin: [...Object.values(config.applications), "https://martolex.com"],
     credentials: true,
   })
 );
+
+
+console.log(config.applications);
+
+scheduleCrons();
 
 if (env == "dev") {
   // db.sync({ alter: true });

@@ -11,7 +11,7 @@ router.post("/signUp", authValidators.signUp, AuthController.signUp);
 router.post("/signIn", authValidators.emailSignIn, AuthController.emailSignIn);
 router.post(
   "/googleSignIn",
-  authValidators.emailSignIn,
+  authValidators.googleSignIn,
   AuthController.googleSignIn
 );
 router.post(

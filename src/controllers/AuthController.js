@@ -188,6 +188,7 @@ const AuthController = {
             "phoneNo",
             "ambassadorId",
             "college",
+            "referralCode",
           ],
         }
       );
