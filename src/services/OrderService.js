@@ -13,10 +13,50 @@ const orderUtils = require("../utils/orderUtils");
 const { plans, returnStates, paymentModes } = require("../utils/enums");
 const { v4: UUIDV4 } = require("uuid");
 const getPaymentLink = require("../utils/Payments/getPaymentLink");
-const { Sequelize } = require("../config/db");
+const Sequelize = require("sequelize");
 const PermissionError = require("../Exceptions/PermissionError");
 
 class OrderService {
+  async getAll() {
+    return await Order.findAll();
+  }
+
+  async getAmbassadorOrders(ambassadorId) {
+    ambassadorId = sequelize.escape(ambassadorId);
+    const leadsSubQuery = `(Select email from Leads where ambassador=${ambassadorId})`;
+    const orders = Order.findAll({
+      include: {
+        model: User,
+        as: "user",
+        attributes: [],
+        required: true,
+        where: {
+          email: { [Sequelize.Op.in]: Sequelize.literal(leadsSubQuery) },
+        },
+      },
+    });
+    return orders;
+  }
+  async getSellerOrders({ sellerId }) {
+    const orders = await Order.findAll({
+      include: {
+        model: OrderItem,
+        as: "items",
+        required: true,
+        include: {
+          model: Book,
+          as: "book",
+          where: { uploader: sellerId },
+          required: true,
+        },
+      },
+    });
+    return orders;
+  }
+
+  async getorderItems(id) {
+    return await OrderItem.findAll({ where: { orderId: id } });
+  }
   async findById(id, options = {}) {
     const { flat } = options;
     return await Order.findByPk(id, {
@@ -155,11 +195,20 @@ class OrderService {
     return result;
   }
 
-  async getUserOrders(userId) {
+  async getOrdersByBook(bookId) {
+    let orders = await OrderItem.findAll({
+      where: { bookId },
+      include: { model: Order, as: "order" },
+    });
+    return orders.map((item) => item.toJSON().order);
+  }
+
+  async getUserOrders(userId, options = {}) {
+    const { flat = false } = options;
     const orders = await Order.findAll({
       where: { userId },
       order: [["createdAt", "DESC"]],
-      include: [
+      include: !flat && [
         {
           model: OrderItem,
           as: "items",
@@ -202,6 +251,10 @@ class OrderService {
       throw new PermissionError("not authorized to access this transaction");
 
     return order.address;
+  }
+
+  async findOrderItemById(id) {
+    return await OrderItem.findByPk(id);
   }
 }
 

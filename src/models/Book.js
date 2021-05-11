@@ -29,6 +29,9 @@ Book.init(
     isApproved: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+      get() {
+        return this.getDataValue("isApproved") === approvalStates.APPROVED;
+      },
     },
     isDeleted: { type: DataTypes.BOOLEAN, defaultValue: false },
     isBuyBackEnabled: { type: DataTypes.BOOLEAN, defaultValue: true },
@@ -43,6 +46,7 @@ Book.init(
     scopes: {
       available: {
         where: {
+          isDeleted: false,
           quantity: { [Op.gt]: 0 },
           isApproved: approvalStates.APPROVED,
         },

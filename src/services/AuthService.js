@@ -197,7 +197,6 @@ class AuthService {
       payload.college = user.college;
       payload.ambassadorId = user.ambassadorId;
     }
-
     return payload;
   }
 
